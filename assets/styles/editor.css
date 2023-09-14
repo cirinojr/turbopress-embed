@@ -1,0 +1,33 @@
+.epg-youtube-editor{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction:column;
+}
+.epg-youtube-editor .label{
+  display: flex;
+  align-items: center;
+}
+.epg-youtube-editor .label svg{
+  width: 64px;
+  height: 64px;
+}
+
+.epg-youtube-editor .input-wrapper{
+  width: 100%;
+}
+.epg-youtube-editor .input-wrapper input{
+  width: 85%;
+  max-width: 550px;
+}
+
+
+.epg-youtube-editor .input-wrapper .epg-youtube-bt{
+  font-size: smaller;
+  margin: 8px;
+  background: #007cba;
+  color: #fff;
+  border: 0;
+  padding: 6px;
+  border-radius: 2px;
+}
