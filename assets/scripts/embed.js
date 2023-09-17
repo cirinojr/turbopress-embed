@@ -15,7 +15,7 @@ const fetchData = async (url,action,id) => {
   });
 
     if (!response.ok) {
-      throw new Error('Verifique sua conexão de internet e tente novamente!');
+      throw new Error('Internet connection error!');
     }
 
     const data = await response.text();

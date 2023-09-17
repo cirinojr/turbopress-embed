@@ -9,6 +9,7 @@
 
 defined('ABSPATH') || exit;
 
+
 // //defines
 // define( 'EPG_VERSION', '1.0' );
 // define( 'EPG__MINIMUM_WP_VERSION', '5.0' );
@@ -30,18 +31,23 @@ class MagicEmbed
     add_action('admin_enqueue_scripts', [$this, 'enqueueAdmin']);
     add_action('wp_ajax_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_nopriv_get_spotify', [$this, 'getSpotify']);
+    add_action('wp_ajax_get_youtube', [$this, 'getYoutube']);
+    add_action('wp_ajax_nopriv_get_youtube', [$this, 'getYoutube']);
     add_action('wp_enqueue_scripts', [$this, 'enqueueJs']);
   }
 
-  public function curlRequest($url)
+  public function curlRequest($url,$agent=false)
   {
-    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_VERBOSE, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    if($agent){
+    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
     curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+    }
     curl_setopt($ch, CURLOPT_URL, $url);
 
 
@@ -76,7 +82,26 @@ class MagicEmbed
     wp_die();
   }
 
-  public function enqueueAdmin(){
+  public function getYoutube()
+  {
+    $base_url = 'https://www.youtube.com/watch?v=' . $_POST['id'];
+    $html = $this->curlRequest($base_url);
+
+
+    if (preg_match('/<meta name="title" content="(.*?)">/', $html, $matches)) {
+      $result['title'] = $matches[1];
+    }
+
+    if (preg_match('/"teaserAvatar":\s*{"thumbnails":\s*\[{"url":\s*"([^"]+)"/', $html, $matches)) {
+      $result['thumb']= $matches[1];
+    }
+
+    echo  json_encode($result,true);
+    wp_die();
+  }
+
+  public function enqueueAdmin()
+  {
     wp_enqueue_style('epg-style', plugins_url('/build/editor_css.css', __FILE__), array(), '1.0');
     wp_enqueue_script('epg-script', plugins_url('/build/editor_js.js', __FILE__), array(), '1.0', true);
   }

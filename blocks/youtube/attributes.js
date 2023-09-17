@@ -1,14 +1,19 @@
 /* eslint-disable */
 export default {
-  text1: {
+  videoId: {
     type: 'string',
-    default:'Contato'
+    default:''
   },
-
-  text2: {
+  title: {
     type: 'string',
-    default:'Caso precise entrar em contato com a nossa assessoria, é só preencher o formulário ou enviar um e-mail para imprensa@contaazul.com'
-  }
-
-
+    default:''
+  },
+  cover: {
+    type: 'string',
+    default:''
+  },
+  icon: {
+    type: 'string',
+    default:''
+  },
 };
