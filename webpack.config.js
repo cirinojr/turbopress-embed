@@ -12,8 +12,9 @@ module.exports = {
    entry: {
        ...getWebpackEntryPoints(),
        blocks: './blocks/index.js',
-       editor_js: './assets/scripts/editor.js',
+       youtube_js: './assets/scripts/youtube.js',
        editor_css: './assets/styles/editor.css',
+
 
    },
 };

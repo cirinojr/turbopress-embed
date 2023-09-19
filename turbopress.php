@@ -1,25 +1,28 @@
 <?php
 
 /**
- * Plugin Name: Embedded Preview Generator
- * Description: Plugin embed
- * Author: Claudio Cirino jr
+ * @link              https://dev.claudiocirino.com
+ * @since             1.0.0
+ * @package           Turbopress_Embed
+ *
+ * @wordpress-plugin
+ * Plugin Name:       TurboPress Embed
+ * Plugin URI:        https://dev.claudiocirino.com
+ * Description:       Embed block plugin for Gutenberg that allows you to generate previews of third-party embedded media without unnecessary loading of content that causes slow page loading
+ * Version:           1.0.0
+ * Author:            Claudio Cirino jr
+ * Author URI:        https://dev.claudiocirino.com
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       turbopress-embed
+ * Domain Path:       /languages
  */
+
 
 
 defined('ABSPATH') || exit;
 
-
-// //defines
-// define( 'EPG_VERSION', '1.0' );
-// define( 'EPG__MINIMUM_WP_VERSION', '5.0' );
-// define( 'EPG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-// define( 'EPG_DELETE_LIMIT', 10000 );
-
-
-// require_once( EPG__PLUGIN_DIR . 'class.api.php' );
-
-class MagicEmbed
+class TurboPress
 {
 
   protected static $instance = null;
@@ -28,17 +31,15 @@ class MagicEmbed
   public function __construct()
   {
     add_action('enqueue_block_editor_assets', [$this, 'gutenberg_scripts']);
-    add_action('admin_enqueue_scripts', [$this, 'enqueueAdmin']);
     add_action('wp_ajax_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_nopriv_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_get_youtube', [$this, 'getYoutube']);
     add_action('wp_ajax_nopriv_get_youtube', [$this, 'getYoutube']);
-    add_action('wp_enqueue_scripts', [$this, 'enqueueJs']);
+
   }
 
   public function curlRequest($url,$agent=false)
   {
-
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -100,20 +101,6 @@ class MagicEmbed
     wp_die();
   }
 
-  public function enqueueAdmin()
-  {
-    wp_enqueue_style('epg-style', plugins_url('/build/editor_css.css', __FILE__), array(), '1.0');
-    wp_enqueue_script('epg-script', plugins_url('/build/editor_js.js', __FILE__), array(), '1.0', true);
-  }
-
-  public function enqueueJs()
-  {
-
-    wp_register_script('embeded', plugins_url('/build/embed.js', __FILE__), array(), '1.0', true);
-    wp_enqueue_script('embeded');
-
-    //wp_enqueue_style('spotify', plugins_url('/builds/spotify.css', __FILE__), false, '1.0', 'all');
-  }
 
   public function gutenberg_scripts()
   {
@@ -125,7 +112,6 @@ class MagicEmbed
       true
     );
   }
-
 
 
   public static function get_instance()
@@ -153,4 +139,4 @@ class MagicEmbed
 }
 
 
-$magic_embed = MagicEmbed::get_instance();
+$turbo_press = TurboPress::get_instance();

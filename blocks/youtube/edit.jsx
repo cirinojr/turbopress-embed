@@ -3,11 +3,10 @@ const { useState } = wp.element;
 import fetchData from '../../assets/scripts/ajax';
 
 const Edit = ({ attributes, setAttributes, className }) => {
-  const { videoId, title, cover, icon } = attributes;
+  const { videoId, title, icon } = attributes;
   const [inputText, setInputText] = useState('');
   const [preview, setPreview] = useState(false);
   const [isLoadding, setIsLoadding] = useState(false);
-
 
   const handleChange = (e) => {
     // 👇 Store the input value to local state
@@ -37,7 +36,6 @@ const Edit = ({ attributes, setAttributes, className }) => {
 
   const createPreview = () => {
     getYoutubeData();
-
 
     return (
       <div
@@ -87,7 +85,7 @@ const Edit = ({ attributes, setAttributes, className }) => {
               width="24"
               height="24"
               viewBox="0 0 24 24"
-              fill='#ffffff'
+              fill="#ffffff"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -118,7 +116,8 @@ const Edit = ({ attributes, setAttributes, className }) => {
 
   return (
     <>
-      { !videoId ? (
+      <style>{`.epg-youtube-editor{width:100%;display:flex;align-items:center;flex-direction:column}.epg-youtube-editor .label{display:flex;align-items:center}.epg-youtube-editor .label svg{width:64px;height:64px}.epg-youtube-editor .input-wrapper{width:100%}.epg-youtube-editor .input-wrapper input{width:85%;max-width:550px}.epg-youtube-editor .input-wrapper .epg-youtube-bt{font-size:smaller;margin:8px;background:#007cba;color:#fff;border:0;padding:6px;border-radius:2px}.epg-alert{color:#f31e1e}.yt-player{position:relative;background-position:center;background-size:cover;cursor:pointer}.yt-player .gradient{display:flex;padding:2.5%;gap:16px;height:49px;width:95%;position:absolute;background-repeat:repeat-x;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADGCAYAAAAT+OqFAAAAdklEQVQoz42QQQ7AIAgEF/T/D+kbq/RWAlnQyyazA4aoAB4FsBSA/bFjuF1EOL7VbrIrBuusmrt4ZZORfb6ehbWdnRHEIiITaEUKa5EJqUakRSaEYBJSCY2dEstQY7AuxahwXFrvZmWl2rh4JZ07z9dLtesfNj5q0FU3A5ObbwAAAABJRU5ErkJggg==);transition:opacity 0.25s cubic-bezier(0,0,.2,1) 0s;pointer-events:none}.yt-player .title{color:#fff;font-size:18px}.yt-player .logo{background:#ccc;width:40px;height:40px;border-radius:50%;display:block;background-position:center}.yt-player .play-icon{position:absolute;top:50%;left:50%;width:68px;height:48px;margin-left:-34px;margin-top:-24px}.yt-player .tag{background:rgba(23,23,23,.8);color:#fff;height:47px;width:181px;font-size:14px;display:flex;position:absolute;bottom:10px;flex-direction:row;align-items:center;justify-content:center}.yt-player .tag svg{margin-left:8px;width:fit-content;height:16px;fill:#fff}.isloadding{position:absolute;color:#fff;background:#0000007d;width:100%;height:100%;display:flex;align-items:center;justify-content:space-around}`}</style>
+      {!videoId ? (
         <div className="epg-youtube-editor">
           <div className="label">
             <span>
@@ -141,7 +140,8 @@ const Edit = ({ attributes, setAttributes, className }) => {
             <input
               type="text"
               name="youtube-url"
-              onChange={handleChange} value={inputText}
+              onChange={handleChange}
+              value={inputText}
             />
             <button className="epg-youtube-bt" onClick={handleYoutube}>
               Embed
@@ -151,6 +151,7 @@ const Edit = ({ attributes, setAttributes, className }) => {
       ) : (
         createPreview()
       )}
+      <script defer async src='/wp-content/plugins/turbopress-embed/build/youtube_js.js'></script>
     </>
   );
 };

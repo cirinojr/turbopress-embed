@@ -40,7 +40,6 @@
   position: relative;
   background-position: center;
   background-size: cover;
-  cursor: pointer;
 }
 
 .yt-player .gradient{
@@ -67,7 +66,6 @@
   height: 40px;
   border-radius: 50%;
   display: block;
-  background-position: center;
 }
 
 .yt-player .play-icon{
