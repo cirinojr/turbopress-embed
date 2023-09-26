@@ -12,8 +12,8 @@ module.exports = {
    entry: {
        ...getWebpackEntryPoints(),
        blocks: './blocks/index.js',
-       youtube_js: './assets/scripts/youtube.js',
-       editor_css: './assets/styles/editor.css',
+       assets_js: './assets/scripts/assets.js',
+       yt_css: './assets/styles/youtube.css',
 
 
    },
