@@ -11,9 +11,8 @@ const Edit = ({ attributes, setAttributes, className }) => {
     setInputText(e.target.value);
   };
 
-  const getYouTubeVideoId = (videoId) => {
-    const regex =
-      /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?feature=player_embedded&v=))([^&?]+)/;
+  const getVimeoVideoId = (videoId) => {
+    const regex =/vimeo\.com\/video\/(\d+)/;
 
     const match = videoId.match(regex);
 
@@ -34,17 +33,17 @@ const Edit = ({ attributes, setAttributes, className }) => {
     }
   };
 
-  const getYoutubeData = async () => {
-    const data = await fetchData('get_youtube', videoId);
-    const json = JSON.parse(data);
-    const title= json.title.length < 56 ? json.title : json.title.substring(0, 55) + '...';
-    setAttributes({ title: title });
-    setAttributes({ icon: json.thumb });
+  const getVimeoData = async () => {
+    const data = await fetchData('get_vimeo', videoId);
+    //const json = JSON.parse(data);
+    console.log(data);
+    // setAttributes({ title: json.title });
+    // setAttributes({ icon: json.thumb });
     setIsLoadding(true);
   };
 
   const createPreview = () => {
-    getYoutubeData();
+    getVimeoData();
 
     return (
       <>
@@ -54,11 +53,11 @@ const Edit = ({ attributes, setAttributes, className }) => {
           width={width}
           height={height}
           className="yt-player"
-          style={{
-            width: `${width}px`,
-            height: `${height}px`,
-            backgroundImage: `url(https://img.youtube.com/vi/${videoId}/hqdefault.jpg)`,
-          }}
+          // style={{
+          //   width: `${width}px`,
+          //   height: `${height}px`,
+          //   backgroundImage: `url(https://img.youtube.com/vi/${videoId}/hqdefault.jpg)`,
+          // }}
         >
           <div className="gradient">
             <span
@@ -122,8 +121,8 @@ const Edit = ({ attributes, setAttributes, className }) => {
       </>
     );
   };
-  const handleYoutube = () => {
-    setAttributes({ videoId: getYouTubeVideoId(inputText) });
+  const handleVimeo = () => {
+    setAttributes({ videoId: getVimeoVideoId(inputText) });
     getWightHeight(inputText);
   };
 
@@ -134,20 +133,9 @@ const Edit = ({ attributes, setAttributes, className }) => {
         <div className="tbe-yt-editor">
           <div className="label">
             <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 48"
-                width="96px"
-                height="96px"
-              >
-                <path
-                  fill="#FF3D00"
-                  d="M43.2,33.9c-0.4,2.1-2.1,3.7-4.2,4c-3.3,0.5-8.8,1.1-15,1.1c-6.1,0-11.6-0.6-15-1.1c-2.1-0.3-3.8-1.9-4.2-4C4.4,31.6,4,28.2,4,24c0-4.2,0.4-7.6,0.8-9.9c0.4-2.1,2.1-3.7,4.2-4C12.3,9.6,17.8,9,24,9c6.2,0,11.6,0.6,15,1.1c2.1,0.3,3.8,1.9,4.2,4c0.4,2.3,0.9,5.7,0.9,9.9C44,28.2,43.6,31.6,43.2,33.9z"
-                />
-                <path fill="#FFF" d="M20 31L20 17 32 24z" />
-              </svg>
+            <svg fill="#1ab7ea" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><g><path d="M22.396 7.164c-.093 2.026-1.507 4.8-4.245 8.32C15.323 19.16 12.93 21 10.97 21c-1.214 0-2.24-1.12-3.08-3.36-.56-2.052-1.118-4.105-1.68-6.158-.622-2.24-1.29-3.36-2.004-3.36-.156 0-.7.328-1.634.98l-.978-1.26c1.027-.903 2.04-1.806 3.037-2.71C6 3.95 7.03 3.328 7.716 3.265c1.62-.156 2.616.95 2.99 3.32.404 2.558.685 4.148.84 4.77.468 2.12.982 3.18 1.543 3.18.435 0 1.09-.687 1.963-2.064.872-1.376 1.34-2.422 1.402-3.142.125-1.187-.343-1.782-1.4-1.782-.5 0-1.013.115-1.542.34 1.023-3.35 2.977-4.976 5.862-4.883 2.14.063 3.148 1.45 3.024 4.16z"></path></g></svg>
             </span>
-            Youtube URL
+            Vimeo URL
           </div>
           <div className="input-wrapper">
             <input
@@ -156,7 +144,7 @@ const Edit = ({ attributes, setAttributes, className }) => {
               onChange={handleChange}
               value={inputText}
             />
-            <button className="epg-youtube-bt" onClick={handleYoutube}>
+            <button className="epg-youtube-bt" onClick={handleVimeo}>
               Embed
             </button>
           </div>

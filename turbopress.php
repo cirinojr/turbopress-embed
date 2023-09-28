@@ -31,13 +31,12 @@ class TurboPress
   public function __construct()
   {
     add_action('enqueue_block_editor_assets', [$this, 'gutenberg_scripts']);
-    add_action('wp_ajax_get_loadfile', [$this, 'loadFile']);
-    add_action('wp_ajax_nopriv_get_loadfile', [$this, 'loadFile']);
     add_action('wp_ajax_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_nopriv_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_get_youtube', [$this, 'getYoutube']);
     add_action('wp_ajax_nopriv_get_youtube', [$this, 'getYoutube']);
-
+    add_action('wp_ajax_get_vimeo', [$this, 'getVimeo']);
+    add_action('wp_ajax_nopriv_get_vimeo', [$this, 'getVimeo']);
   }
 
   public function curlRequest($url, $agent = false)
@@ -85,14 +84,6 @@ class TurboPress
     wp_die();
   }
 
-  public function loadFile()
-  {
-    $base_url = plugins_url($_POST['id'], __FILE__);
-    echo file_get_contents($base_url);
-    // echo $file;
-    //echo $base_url;
-    wp_die();
-  }
 
   public function getYoutube()
   {
@@ -112,14 +103,46 @@ class TurboPress
     wp_die();
   }
 
+  public function getVimeo()
+  {
+    $base_url = 'http://vimeo.com/api/v2/video/' . $_POST['id'] . '.xml';
+    $xml = $this->curlRequest($base_url);
+
+    if (preg_match('/<title>(.*?)<\/title>/', $xml, $matches)) {
+      $result['title'] = $matches[1];
+    }
+
+    if (preg_match('/<description>(.*?)<\/description>/', $xml, $matches)) {
+      $result['description'] = $matches[1];
+    }
+
+    if (preg_match('/<user_name>(.*?)<\/user_name>/', $xml, $matches)) {
+      $result['user_name'] = $matches[1];
+    }
+
+    if (preg_match('/<user_portrait_small>(.*?)<\/user_portrait_small>/', $xml, $matches)) {
+      $result['user_portrait_small'] = $matches[1];
+    }
+
+
+
+
+    if (preg_match('/<thumbnail_large>(.*?)<\/thumbnail_large>/', $xml, $matches)) {
+      $result['thumb'] = $matches[1];
+    }
+    echo $result['thumb'];
+
+    wp_die();
+  }
+
 
   public function gutenberg_scripts()
   {
     wp_enqueue_script(
       'embed-gutenberg-scripts',
-      plugins_url('/build/index.js', __FILE__),
+      plugins_url('/build/blocks.js', __FILE__),
       ['wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor', 'wp-components',],
-      plugins_url('/build/index.js', __FILE__),
+      plugins_url('/build/blocks.js', __FILE__),
       true
     );
   }
