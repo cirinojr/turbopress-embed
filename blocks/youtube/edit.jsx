@@ -167,7 +167,7 @@ const Edit = ({ attributes, setAttributes, className }) => {
       <script
         defer
         async
-        src="/wp-content/plugins/turbopress-embed/assets/scripts/youtube.js"
+        src="/wp-content/plugins/turbopress-embed/build/yt_js.js"
       ></script>
     </>
   );

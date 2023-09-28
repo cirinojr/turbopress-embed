@@ -13,7 +13,6 @@ module.exports = {
        ...getWebpackEntryPoints(),
        blocks: './blocks/index.js',
        yt_css: './assets/styles/youtube.css',
-
-
+       yt_js: './assets/scripts/youtube.js',
    },
 };
