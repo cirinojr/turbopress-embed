@@ -31,6 +31,8 @@ class TurboPress
   public function __construct()
   {
     add_action('enqueue_block_editor_assets', [$this, 'gutenberg_scripts']);
+    add_action('wp_ajax_get_loadfile', [$this, 'loadFile']);
+    add_action('wp_ajax_nopriv_get_loadfile', [$this, 'loadFile']);
     add_action('wp_ajax_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_nopriv_get_spotify', [$this, 'getSpotify']);
     add_action('wp_ajax_get_youtube', [$this, 'getYoutube']);
@@ -38,16 +40,16 @@ class TurboPress
 
   }
 
-  public function curlRequest($url,$agent=false)
+  public function curlRequest($url, $agent = false)
   {
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_VERBOSE, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    if($agent){
-    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-    curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+    if ($agent) {
+      $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+      curl_setopt($ch, CURLOPT_USERAGENT, $agent);
     }
     curl_setopt($ch, CURLOPT_URL, $url);
 
@@ -83,6 +85,15 @@ class TurboPress
     wp_die();
   }
 
+  public function loadFile()
+  {
+    $base_url = plugins_url($_POST['id'], __FILE__);
+    echo file_get_contents($base_url);
+    // echo $file;
+    //echo $base_url;
+    wp_die();
+  }
+
   public function getYoutube()
   {
     $base_url = 'https://www.youtube.com/watch?v=' . $_POST['id'];
@@ -94,10 +105,10 @@ class TurboPress
     }
 
     if (preg_match('/"teaserAvatar":\s*{"thumbnails":\s*\[{"url":\s*"([^"]+)"/', $html, $matches)) {
-      $result['thumb']= $matches[1];
+      $result['thumb'] = $matches[1];
     }
 
-    echo  json_encode($result,true);
+    echo  json_encode($result, true);
     wp_die();
   }
 

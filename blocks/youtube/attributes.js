@@ -1,4 +1,3 @@
-/* eslint-disable */
 export default {
   videoId: {
     type: 'string',
@@ -22,6 +21,6 @@ export default {
   },
   css:{
     type:'string',
-    default:'inicial'
+    default:'/wp-content/plugins/turbopress-embed/build/yt_css.css'
   }
 };

@@ -2,6 +2,7 @@ import Edit from './edit';
 import Save from './save';
 import attributes from './attributes';
 
+
 const { registerBlockType } = wp.blocks;
 
 

@@ -1,18 +1,18 @@
 const { RichText } = wp.blockEditor;
 
 const Save = ({ attributes, className }) => {
-  const { videoId, title, icon, width, height,css } = attributes;
+  const { videoId, title, icon, width, height, css } = attributes;
 
   return (
     <>
-
+      <style>{`@import "${css}"`}</style>
       <div
         ytvideo={videoId}
         width={width}
         height={height}
         className="yt-player"
         style={{
-          width:`${width}px`,
+          width: `${width}px`,
           height: `${height}px`,
           backgroundImage: `url(https://img.youtube.com/vi/${videoId}/hqdefault.jpg)`,
         }}
@@ -54,11 +54,8 @@ const Save = ({ attributes, className }) => {
       <script
         defer
         async
-        src="/wp-content/plugins/turbopress-embed/assets/scripts/assets.js"
-      >
-       headLink('/wp-content/plugins/turbopress-embed/assets/yt_css.css','yt-styles');
-       headJs('/wp-content/plugins/turbopress-embed/build/youtube_js.js','yt-script');
-      </script>
+        src="/wp-content/plugins/turbopress-embed/assets/scripts/youtube.js"
+      ></script>
     </>
   );
 };
