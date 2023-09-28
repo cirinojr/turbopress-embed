@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @link              https://dev.claudiocirino.com
+ * @link              https://dev.claudiocirino.com/turbopress-embed
  * @since             1.0.0
  * @package           Turbopress_Embed
  *
  * @wordpress-plugin
  * Plugin Name:       TurboPress Embed
- * Plugin URI:        https://dev.claudiocirino.com
+ * Plugin URI:        https://dev.claudiocirino.com/turbopress-embed
  * Description:       Embed block plugin for Gutenberg that allows you to generate previews of third-party embedded media without unnecessary loading of content that causes slow page loading
  * Version:           1.0.0
  * Author:            Claudio Cirino jr
