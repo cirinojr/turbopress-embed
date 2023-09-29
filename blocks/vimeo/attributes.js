@@ -19,8 +19,11 @@ export default {
     type:'string',
     default:'360'
   },
+  cover:{
+    type:'string'
+  },
   css:{
     type:'string',
-    default:'/wp-content/plugins/turbopress-embed/build/yt_css.css'
+    default:'/wp-content/plugins/turbopress-embed/build/vm_css.css'
   }
 };

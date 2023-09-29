@@ -105,6 +105,7 @@ class TurboPress
 
   public function getVimeo()
   {
+
     $base_url = 'http://vimeo.com/api/v2/video/' . $_POST['id'] . '.xml';
     $xml = $this->curlRequest($base_url);
 
@@ -125,12 +126,11 @@ class TurboPress
     }
 
 
-
-
     if (preg_match('/<thumbnail_large>(.*?)<\/thumbnail_large>/', $xml, $matches)) {
       $result['thumb'] = $matches[1];
     }
-    echo $result['thumb'];
+
+    echo  json_encode($result, true);
 
     wp_die();
   }
