@@ -15,5 +15,6 @@ module.exports = {
        yt_css: './assets/styles/youtube.css',
        yt_js: './assets/scripts/youtube.js',
        vm_css: './assets/styles/vimeo.css',
+       vm_js: './assets/scripts/vimeo.js',
    },
 };

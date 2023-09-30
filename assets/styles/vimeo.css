@@ -20,7 +20,6 @@
   width: 85%;
   max-width: 550px;
 }
-
 .tbe-vm-editor .input-wrapper .epg-vimeo-bt {
   font-size: smaller;
   margin: 8px;
@@ -30,14 +29,16 @@
   padding: 6px;
   border-radius: 2px;
 }
-
+.vm-player{
+  position: relative;
+  cursor: pointer;
+}
 .vm-player .icons {
   display: flex;
   flex-direction: column;
   position: absolute;
   right: 5px;
 }
-
 .vm-player .icons svg {
   width: 20px;
   height: 28px;
@@ -46,7 +47,6 @@
   padding: 1px 6px;
   margin: 8px 0 0;
 }
-
 .vm-player .controls {
   position: absolute;
   bottom: 8px;
@@ -66,11 +66,22 @@
   justify-content: center;
   align-items: center;
 }
-
 .vm-player .controls .ctrlbar{
   background-color: rgba(0, 0, 0, 0.9);
   border-radius: 4px;
-  display:block;
+  display: flex;
   width: 100%;
+  align-items: center;
   height: 32px;
+  justify-content: space-around;
+}
+.vm-player .controls .ctrlbar .progress{
+  background: #ffffff33;
+  height: 8px;
+  border-radius: 4px;
+  width: 85%;
+}
+.vm-player .controls .ctrlbar svg{
+  fill: #fff;
+  width: 16px;
 }
