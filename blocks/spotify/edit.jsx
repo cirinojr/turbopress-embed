@@ -1,9 +1,10 @@
 const { RichText } = wp.blockEditor;
 const { useState } = wp.element;
+import Inspector from "./inspector";
 import fetchData from '../../assets/scripts/ajax';
 
 const Edit = ({ attributes, setAttributes, className }) => {
-  const { videoId, title, cover, duration, css } = attributes;
+  const { videoId, title, cover, duration, css, bg } = attributes;
   const [inputText, setInputText] = useState('');
   const [isLoadding, setIsLoadding] = useState(false);
 
@@ -24,14 +25,28 @@ const Edit = ({ attributes, setAttributes, className }) => {
     }
   };
 
+  const min2Hour=(minutes)=> {
+    if (minutes < 0) {
+      return "Invalid input";
+    }
+
+    const hours = Math.floor(minutes / 3600);
+    const remainingMinutes = Math.floor(minutes / 1800);
+
+    const hoursStr = String(hours).padStart(2, "0");
+    const minutesStr = String(remainingMinutes).padStart(2, "0");
+
+    return `${hoursStr}:${minutesStr}`;
+  }
+
+
   const getSpotifyData = async () => {
     const data = await fetchData('get_spotify', videoId);
 
     const json = JSON.parse(data);
-
     setAttributes({ title: json.title });
     setAttributes({ cover: json.cover });
-    setAttributes({ duration: json.duration });
+    setAttributes({ duration: min2Hour(parseInt(json.duration)) });
 
     setIsLoadding(true);
   };
@@ -41,10 +56,10 @@ const Edit = ({ attributes, setAttributes, className }) => {
 
     return (
       <>
-        <style>{`@import "${css}"`}</style>
-        <div className="spotify-card">
+      <Inspector attributes={attributes} setAttributes={setAttributes} />
+        <div className="spotify-card" spotifyembed={videoId} style={{backgroundColor:bg }}>
           <div className='cover'>
-            <img src={cover} width="30%"  alt="" />
+            <img src={cover} width="300"  alt="" />
           </div>
           <div class="sp-wrapper">
             <div class="right">
@@ -62,8 +77,6 @@ const Edit = ({ attributes, setAttributes, className }) => {
             </div>
             <div class="content">
               <a href="">{title}</a>
-              <span></span>
-              <button>Follow</button>
             </div>
             <div class="right">
               <span class="time">{duration}</span>
@@ -72,7 +85,6 @@ const Edit = ({ attributes, setAttributes, className }) => {
                 height="48"
                 width="48"
                 aria-hidden="false"
-                class="Svg-sc-ytk21e-0 haNxPq PlayButton_playPauseIcon__T3hX3"
                 viewBox="0 0 24 24"
                 data-encore-id="icon"
               >
@@ -81,6 +93,31 @@ const Edit = ({ attributes, setAttributes, className }) => {
               </svg>
             </div>
           </div>
+          {!isLoadding && (
+            <div className="isloadding">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="#ffffff"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"
+                  opacity=".25"
+                />
+                <path d="M10.14,1.16a11,11,0,0,0-9,8.92A1.59,1.59,0,0,0,2.46,12,1.52,1.52,0,0,0,4.11,10.7a8,8,0,0,1,6.66-6.61A1.42,1.42,0,0,0,12,2.69h0A1.57,1.57,0,0,0,10.14,1.16Z">
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="0.75s"
+                    values="0 12 12;360 12 12"
+                    repeatCount="indefinite"
+                  />
+                </path>
+              </svg>
+            </div>
+          )}
         </div>
       </>
     );
@@ -117,7 +154,7 @@ const Edit = ({ attributes, setAttributes, className }) => {
               onChange={handleChange}
               value={inputText}
             />
-            <button className="epg-spotify-bt" onClick={handleSpotify}>
+            <button className="epg-youtube-bt" onClick={handleSpotify}>
               Embed
             </button>
           </div>

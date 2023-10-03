@@ -37,7 +37,8 @@ const Edit = ({ attributes, setAttributes, className }) => {
   const getYoutubeData = async () => {
     const data = await fetchData('get_youtube', videoId);
     const json = JSON.parse(data);
-    const title= json.title.length < 56 ? json.title : json.title.substring(0, 55) + '...';
+    const title =
+      json.title.length < 56 ? json.title : json.title.substring(0, 55) + '...';
     setAttributes({ title: title });
     setAttributes({ icon: json.thumb });
     setIsLoadding(true);
@@ -48,7 +49,6 @@ const Edit = ({ attributes, setAttributes, className }) => {
 
     return (
       <>
-        <style>{`@import "${css}"`}</style>
         <div
           ytvideo={videoId}
           width={width}
