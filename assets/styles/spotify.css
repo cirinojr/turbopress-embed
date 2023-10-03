@@ -17,19 +17,19 @@
   text-overflow: ellipsis;
   color:#fff;
   font-family: sans-serif;
-    font-weight: 600;
-    font-size: 1.5rem;
-    text-decoration: none;
+  font-weight: 600;
+  font-size: 1.5rem;
+  text-decoration: none;
 }
 .spotify-card .right{
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.spotify-card .wrapper{
+.spotify-card .sp-wrapper{
   display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .spotify-card .content{
   display: flex;

@@ -1,0 +1,36 @@
+.tbe-yt-editor{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction:column;
+}
+.tbe-yt-editor .label{
+  display: flex;
+  align-items: center;
+}
+.tbe-yt-editor .label svg{
+  width: 64px;
+  height: 64px;
+}
+
+.tbe-yt-editor .input-wrapper{
+  width: 100%;
+}
+.tbe-yt-editor .input-wrapper input{
+  width: 85%;
+  max-width: 550px;
+}
+
+.tbe-yt-editor .input-wrapper .epg-youtube-bt{
+  font-size: smaller;
+  margin: 8px;
+  background: #007cba;
+  color: #fff;
+  border: 0;
+  padding: 6px;
+  border-radius: 2px;
+}
+
+.epg-alert{
+  color: #f31e1e;
+}

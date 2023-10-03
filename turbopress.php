@@ -67,20 +67,25 @@ class TurboPress
   public function getSpotify()
   {
 
-    $base_url = 'https://open.spotify.com/embed/episode/' . $_POST['id'];
-    $html = $this->curlRequest($base_url);
-    $doc = new DOMDocument();
-    $doc->loadHTML($html);
-    $scripts = $doc->getElementsByTagName('script');
+    $base_url = $_POST['id'];
+    $html = $this->curlRequest($base_url,true);
 
-    for ($i = 0; $i < $scripts->length; $i++) {
-      $script = $scripts->item($i);
-      if ('__NEXT_DATA__' === $script->getAttribute('id')) {
-        echo  $script->nodeValue;
-      }
+    if (preg_match('/<title>(.*?)<\/title>/', $html, $matches)) {
+      $result['title'] = $matches[1];
+    }
+
+    if (preg_match('/<meta property="og:image" content="(.*?)"\/>/', $html, $matches)) {
+      $result['cover'] = $matches[1];
+    }
+
+    if (preg_match('/<meta name="music:duration" content="(.*?)"\/>/', $html, $matches)) {
+      $result['duration'] = $matches[1];
     }
 
 
+
+
+    echo  json_encode($result, true);
     wp_die();
   }
 
@@ -135,6 +140,11 @@ class TurboPress
     wp_die();
   }
 
+  public function getPluginPath(){
+    $path=plugins_url(__FILE__);
+    echo $path;
+    wp_die();
+  }
 
   public function gutenberg_scripts()
   {
@@ -145,6 +155,8 @@ class TurboPress
       plugins_url('/build/blocks.js', __FILE__),
       true
     );
+
+    wp_enqueue_style('tbe-style', plugins_url('/build/imports.css', __FILE__) );
   }
 
 
