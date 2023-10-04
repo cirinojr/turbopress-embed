@@ -1,0 +1,87 @@
+.tbe-vm-editor {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.tbe-vm-editor .label {
+  display: flex;
+  align-items: center;
+}
+.tbe-vm-editor .label svg {
+  width: 64px;
+  height: 64px;
+}
+
+.tbe-vm-editor .input-wrapper {
+  width: 100%;
+}
+.tbe-vm-editor .input-wrapper input {
+  width: 85%;
+  max-width: 550px;
+}
+.tbe-vm-editor .input-wrapper .epg-vimeo-bt {
+  font-size: smaller;
+  margin: 8px;
+  background: #007cba;
+  color: #fff;
+  border: 0;
+  padding: 6px;
+  border-radius: 2px;
+}
+.vm-player{
+  position: relative;
+  cursor: pointer;
+}
+.vm-player .icons {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 5px;
+}
+.vm-player .icons svg {
+  width: 20px;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin: 8px 0 0;
+}
+.vm-player .controls {
+  position: absolute;
+  bottom: 8px;
+  width: 95%;
+  margin: 0 2.5%;
+  height: 2.2em;
+  display: flex;
+  gap: 12px;
+}
+.vm-player .controls .play {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  width: 56px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.vm-player .controls .ctrlbar{
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  height: 32px;
+  justify-content: space-around;
+}
+.vm-player .controls .ctrlbar .progress{
+  background: #ffffff33;
+  height: 8px;
+  border-radius: 4px;
+  width: 85%;
+}
+.vm-player .controls .ctrlbar svg{
+  fill: #fff;
+  width: 16px;
+}

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @link              https://dev.claudiocirino.com/turbopress-embed
+ * @link              https://dev.claudiocirino.com
  * @since             1.0.0
  * @package           Turbopress_Embed
  *
  * @wordpress-plugin
  * Plugin Name:       TurboPress Embed
- * Plugin URI:        https://dev.claudiocirino.com/turbopress-embed
+ * Plugin URI:        https://dev.claudiocirino.com
  * Description:       Embed block plugin for Gutenberg that allows you to generate previews of third-party embedded media without unnecessary loading of content that causes slow page loading
  * Version:           1.0.0
  * Author:            Claudio Cirino jr
@@ -67,20 +67,25 @@ class TurboPress
   public function getSpotify()
   {
 
-    $base_url = 'https://open.spotify.com/embed/episode/' . $_POST['id'];
-    $html = $this->curlRequest($base_url);
-    $doc = new DOMDocument();
-    $doc->loadHTML($html);
-    $scripts = $doc->getElementsByTagName('script');
+    $base_url = $_POST['id'];
+    $html = $this->curlRequest($base_url,true);
 
-    for ($i = 0; $i < $scripts->length; $i++) {
-      $script = $scripts->item($i);
-      if ('__NEXT_DATA__' === $script->getAttribute('id')) {
-        echo  $script->nodeValue;
-      }
+    if (preg_match('/<title>(.*?)<\/title>/', $html, $matches)) {
+      $result['title'] = $matches[1];
+    }
+
+    if (preg_match('/<meta property="og:image" content="(.*?)"\/>/', $html, $matches)) {
+      $result['cover'] = $matches[1];
+    }
+
+    if (preg_match('/<meta name="music:duration" content="(.*?)"\/>/', $html, $matches)) {
+      $result['duration'] = $matches[1];
     }
 
 
+
+
+    echo  json_encode($result, true);
     wp_die();
   }
 
@@ -105,6 +110,7 @@ class TurboPress
 
   public function getVimeo()
   {
+
     $base_url = 'http://vimeo.com/api/v2/video/' . $_POST['id'] . '.xml';
     $xml = $this->curlRequest($base_url);
 
@@ -125,16 +131,20 @@ class TurboPress
     }
 
 
-
-
     if (preg_match('/<thumbnail_large>(.*?)<\/thumbnail_large>/', $xml, $matches)) {
       $result['thumb'] = $matches[1];
     }
-    echo $result['thumb'];
+
+    echo  json_encode($result, true);
 
     wp_die();
   }
 
+  public function getPluginPath(){
+    $path=plugins_url(__FILE__);
+    echo $path;
+    wp_die();
+  }
 
   public function gutenberg_scripts()
   {
@@ -145,6 +155,8 @@ class TurboPress
       plugins_url('/build/blocks.js', __FILE__),
       true
     );
+
+    wp_enqueue_style('tbe-style', plugins_url('/build/imports.css', __FILE__) );
   }
 
 
