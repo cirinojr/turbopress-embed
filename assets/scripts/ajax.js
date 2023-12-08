@@ -1,12 +1,16 @@
 const fetchData = async (action,id) => {
-  const url = '/wp-admin/admin-ajax.php';
+  const url = ajax_object.ajax_url;
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: `action=${action}&id=${id}`
+      body: new URLSearchParams({
+        'action': action,
+        'id': id,
+        'nonce': ajax_object.nonce
+    })
   });
 
     if (!response.ok) {

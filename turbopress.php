@@ -39,112 +39,108 @@ class TurboPress
     add_action('wp_ajax_nopriv_get_vimeo', [$this, 'getVimeo']);
   }
 
-  public function curlRequest($url, $agent = false)
-  {
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_VERBOSE, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    if ($agent) {
-      $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-      curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-    }
-    curl_setopt($ch, CURLOPT_URL, $url);
-
-
-    $response = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-      return 'cURL Error: ' . curl_error($ch);
-    }
-
-    curl_close($ch);
-
-    return $response;
-  }
 
   public function getSpotify()
   {
 
-    $base_url = $_POST['id'];
-    $html = $this->curlRequest($base_url,true);
+    $id = sanitize_text_field($_POST['id']);
 
-    if (preg_match('/<title>(.*?)<\/title>/', $html, $matches)) {
-      $result['title'] = $matches[1];
+    if (isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'tb_nonce') && current_user_can('edit_posts')) {
+
+      $url_data = wp_remote_get($id);
+      $html     = wp_remote_retrieve_body($url_data);
+
+      if (preg_match('/<title>(.*?)<\/title>/', $html, $matches)) {
+        $result['title'] = $matches[1];
+      }
+
+      if (preg_match('/<meta property="og:image" content="(.*?)"\/>/', $html, $matches)) {
+        $result['cover'] = $matches[1];
+      }
+
+      if (preg_match('/<meta name="music:duration" content="(.*?)"\/>/', $html, $matches)) {
+        $result['duration'] = $matches[1];
+      }
+
+
+      echo  wp_json_encode($result, true);
+    } else {
+
+      $response = array('success' => false, 'message' => 'Nonce verification failed');
+      echo wp_json_encode($response);
     }
 
-    if (preg_match('/<meta property="og:image" content="(.*?)"\/>/', $html, $matches)) {
-      $result['cover'] = $matches[1];
-    }
-
-    if (preg_match('/<meta name="music:duration" content="(.*?)"\/>/', $html, $matches)) {
-      $result['duration'] = $matches[1];
-    }
-
-
-
-
-    echo  json_encode($result, true);
     wp_die();
   }
 
 
   public function getYoutube()
   {
-    $base_url = 'https://www.youtube.com/watch?v=' . $_POST['id'];
-    $html = $this->curlRequest($base_url);
+    $id = sanitize_text_field($_POST['id']);
+
+    if (isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'tb_nonce') && current_user_can('edit_posts')) {
+
+      $url_data = wp_remote_get('https://www.youtube.com/watch?v=' . $id);
+      $html     = wp_remote_retrieve_body($url_data);
 
 
-    if (preg_match('/<meta name="title" content="(.*?)">/', $html, $matches)) {
-      $result['title'] = $matches[1];
+      if (preg_match('/<meta name="title" content="(.*?)">/', $html, $matches)) {
+        $result['title'] = $matches[1];
+      }
+
+      if (preg_match('/"teaserAvatar":\s*{"thumbnails":\s*\[{"url":\s*"([^"]+)"/', $html, $matches)) {
+        $result['thumb'] = $matches[1];
+      }
+
+      echo  wp_json_encode($result, true);
+    } else {
+
+      $response = array('success' => false, 'message' => 'Nonce verification failed');
+      echo wp_json_encode($response);
     }
-
-    if (preg_match('/"teaserAvatar":\s*{"thumbnails":\s*\[{"url":\s*"([^"]+)"/', $html, $matches)) {
-      $result['thumb'] = $matches[1];
-    }
-
-    echo  json_encode($result, true);
     wp_die();
   }
 
   public function getVimeo()
   {
 
-    $base_url = 'http://vimeo.com/api/v2/video/' . $_POST['id'] . '.xml';
-    $xml = $this->curlRequest($base_url);
+    $id = sanitize_text_field($_POST['id']);
 
-    if (preg_match('/<title>(.*?)<\/title>/', $xml, $matches)) {
-      $result['title'] = $matches[1];
+    if (isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'tb_nonce') && current_user_can('edit_posts')) {
+
+      $url_data = wp_remote_get('http://vimeo.com/api/v2/video/' . $id . '.xml');
+      $xml     = wp_remote_retrieve_body($url_data);
+
+      if (preg_match('/<title>(.*?)<\/title>/', $xml, $matches)) {
+        $result['title'] = $matches[1];
+      }
+
+      if (preg_match('/<description>(.*?)<\/description>/', $xml, $matches)) {
+        $result['description'] = $matches[1];
+      }
+
+      if (preg_match('/<user_name>(.*?)<\/user_name>/', $xml, $matches)) {
+        $result['user_name'] = $matches[1];
+      }
+
+      if (preg_match('/<user_portrait_small>(.*?)<\/user_portrait_small>/', $xml, $matches)) {
+        $result['user_portrait_small'] = $matches[1];
+      }
+
+
+      if (preg_match('/<thumbnail_large>(.*?)<\/thumbnail_large>/', $xml, $matches)) {
+        $result['thumb'] = $matches[1];
+      }
+
+      echo  wp_json_encode($result, true);
+    } else {
+
+      $response = array('success' => false, 'message' => 'Nonce verification failed');
+      echo wp_json_encode($response);
     }
-
-    if (preg_match('/<description>(.*?)<\/description>/', $xml, $matches)) {
-      $result['description'] = $matches[1];
-    }
-
-    if (preg_match('/<user_name>(.*?)<\/user_name>/', $xml, $matches)) {
-      $result['user_name'] = $matches[1];
-    }
-
-    if (preg_match('/<user_portrait_small>(.*?)<\/user_portrait_small>/', $xml, $matches)) {
-      $result['user_portrait_small'] = $matches[1];
-    }
-
-
-    if (preg_match('/<thumbnail_large>(.*?)<\/thumbnail_large>/', $xml, $matches)) {
-      $result['thumb'] = $matches[1];
-    }
-
-    echo  json_encode($result, true);
-
     wp_die();
   }
 
-  public function getPluginPath(){
-    $path=plugins_url(__FILE__);
-    echo $path;
-    wp_die();
-  }
 
   public function gutenberg_scripts()
   {
@@ -156,7 +152,15 @@ class TurboPress
       true
     );
 
-    wp_enqueue_style('tbe-style', plugins_url('/build/imports.css', __FILE__) );
+    $ajax_nonce = wp_create_nonce('tb_nonce');
+
+    wp_localize_script(
+      'embed-gutenberg-scripts',
+      'ajax_object',
+      array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => $ajax_nonce)
+    );
+
+    wp_enqueue_style('tbe-style', plugins_url('/build/imports.css', __FILE__));
   }
 
 
