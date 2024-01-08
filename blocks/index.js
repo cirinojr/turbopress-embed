@@ -1,3 +1,3 @@
-import './form/index';
-import './form-wrapper/index';
-import './form-range/index';
+import './vimeo/index';
+import './youtube/index';
+import './spotify/index';

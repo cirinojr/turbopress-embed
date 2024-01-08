@@ -1,5 +1,5 @@
 {
-  "name": "skallar-form",
+  "name": "embedded-preview-generator",
   "version": "1.0.0",
   "description": "A WordPress project using wp-scripts for building and watching JavaScript and CSS files.",
   "scripts": {
