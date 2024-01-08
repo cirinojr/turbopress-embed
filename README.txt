@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Embed block plugin for Gutenberg that allows you to generate previews of third-party embedded media without unnecessary loading of content that causes slow page loading
+Plugin de blocos de embed para Gutenberg que permite gerar preview de mídias incorporadas de terceiros sem o carregamento desnecessário de conteúdo que ocasiona lentidão no carregamento das páginas
 
 == Description ==
 
@@ -37,8 +37,9 @@ It's very easy, when adding the url to the block the plugin creates a static ver
 
 e.g.
 
-1. Install and activate the plugin
-2. After activating the exclusive blocks available in the Gutenberg editor
+1. Upload `turbopress-embed.php` to the `/wp-content/plugins/` directory
+1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
 
 
 
