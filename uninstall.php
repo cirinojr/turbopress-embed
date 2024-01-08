@@ -22,7 +22,7 @@
  * @link       https://dev.claudiocirino.com
  * @since      1.0.0
  *
- * @package    Turbopress_Embed
+ * @package    Skallar_Form
  */
 
 // If uninstall not called from WordPress, then exit.

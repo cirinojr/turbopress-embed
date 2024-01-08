@@ -12,12 +12,5 @@ module.exports = {
    entry: {
        ...getWebpackEntryPoints(),
        blocks: './blocks/index.js',
-       yt_css: './assets/styles/youtube.css',
-       yt_js: './assets/scripts/youtube.js',
-       vm_css: './assets/styles/vimeo.css',
-       vm_js: './assets/scripts/vimeo.js',
-       sf_css: './assets/styles/spotify.css',
-       sf_js: './assets/scripts/spotify.js',
-       imports: './assets/styles/imports.css',
    },
 };
