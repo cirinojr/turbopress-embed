@@ -24,7 +24,10 @@ const Edit = ({ attributes, setAttributes, className }) => {
           {
             className: 'f-container f-flex f-colunm',
           },
-          [['skl/form']],
+          [
+            ['skl/form'],
+            ['skl/check', {  }]
+          ],
         ],
       ]}
     />

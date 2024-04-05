@@ -1,17 +1,7 @@
-const fetchData = async (action,id) => {
+const fetchData = async (action) => {
   const url = ajax_object.ajax_url;
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({
-        'action': action,
-        'id': id,
-        'nonce': ajax_object.nonce
-    })
-  });
+    const response = await fetch(url+'?action='+action);
 
     if (!response.ok) {
       throw new Error('Internet connection error!');

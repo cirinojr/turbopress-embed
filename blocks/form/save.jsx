@@ -1,47 +1,39 @@
 const { RichText } = wp.blockEditor;
 
 const Save = ({ attributes, className }) => {
-  const { name, email,button } = attributes;
+  const {
+    name,
+    email,
+    button,
+    required,
+    email_format,
+    sending,
+    sucess_send,
+    error_send,
+  } = attributes;
 
   return (
-    <form class="f-container f-flex f-colunm" method='POST'>
-      <label>
-        <RichText.Content tagName="span" value={name} />
+    <>
+      <script>const opt_form ={`{"required":"${required}", "email_format":"${email_format}","sending":"${sending}","sucess_send":"${sucess_send}","error_send":"${error_send}"}`}</script>
+      <form class="f-container f-flex f-colunm" method="POST">
+        <label>
+          <RichText.Content tagName="span" value={name} />
 
-        <input type="text" id="name" name="name"  required />
-      </label>
-      <label>
-        <RichText.Content tagName="span" value={email} />
-        <input type="email" id="email" name="email" required />
-      </label>
-
-      <RichText.Content tagName="button" id="form-submit" value={button} className="btn form-submit" />
-    
-
-      <div class="checks-box">
-        <input
-          type="checkbox"
-          name="renda"
-          id="srenda"
-          value="Sem renda mínima"
+          <input type="text" id="name" name="name" required />
+        </label>
+        <label>
+          <RichText.Content tagName="span" value={email} />
+          <input type="email" id="email" name="email" required />
+        </label>
+        <button id="form-submit" className="btn form-submit" >
+        <RichText.Content
+         
+          value={button}
+          
         />
-        <label for="srenda">Sem renda mínima</label>
-        <input
-          type="checkbox"
-          name="prog"
-          id="prog"
-          value="Programa de Pontos"
-        />
-        <label for="prog">Programa de Pontos</label>
-        <input
-          type="checkbox"
-          name="limite"
-          id="limite"
-          value="Limite de R$ 25.000"
-        />
-        <label for="limite">Limite de R$ 25.000</label>
-      </div>
-    </form>
+        </button>
+      </form>
+    </>
   );
 };
 

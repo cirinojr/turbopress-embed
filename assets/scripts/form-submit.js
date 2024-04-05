@@ -35,14 +35,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
   };
 
   const removeAlert = (field) => {
-    if (field.parentNode.getElementsByTagName('span')[0]) {
-      field.parentNode.getElementsByTagName('span')[0].remove();
+    if (field.parentNode.getElementsByTagName('i')[0]) {
+      field.parentNode.getElementsByTagName('i')[0].remove();
     }
   };
 
-  const addAlert = (field, msg = 'Campo Obrigatório!') => {
-    const span = document.createElement('span');
-    span.style.color = 'red';
+  const addAlert = (field, msg = opt_form.required) => {
+    const span = document.createElement('i');
     span.innerHTML = msg;
     field.parentNode.insertBefore(span, field);
     field.focus();
@@ -60,7 +59,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
   const verifyEmail = (field) => {
     if (!isNull(field) && 'email' === field.type && !emailPattern.test(field.value)) {
-      addAlert(field, 'Formato de E-mail inválido!');
+      addAlert(field, opt_form.email_format);
     }
   }
 
@@ -99,24 +98,35 @@ document.addEventListener("DOMContentLoaded", (event) => {
   };
 
   const form_submit = document.querySelector('.form-submit');
-  form_submit.addEventListener('click', async (e) => {
-    e.preventDefault();
+  if (form_submit) {
+    form_submit.addEventListener('click', async (e) => {
+      e.preventDefault();
+      validated = true;
 
-    const span = document.createElement('span');
-    span.style.color = 'red';
 
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach((field) => {
-      removeAlert(field);
-      isRequired(field);
-      verifyEmail(field);
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach((field) => {
+        removeAlert(field);
+        isRequired(field);
+        verifyEmail(field);
+      });
+
+
+      if (validated) {
+        form_submit.innerHTML = opt_form.sending;
+        form_submit.disabled = true;
+        const result = await fetchData('send_form');
+
+        if (result) {
+          form_submit.innerHTML = opt_form.sucess_send;
+          form_submit.style.backgroundColor = '#52c41a';
+          console.log(result);
+        } else {
+          form_submit.innerHTML = opt_form.error_send;
+          form_submit.disabled = false;
+        }
+
+      }
     });
-
-
-    if (validated) {
-    const result = await fetchData('send_form');
-    console.log(result);
-    }
-  });
-
+  }
 });

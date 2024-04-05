@@ -22,7 +22,7 @@ body {
   font-size: 24px;
   line-height: 36px;
   text-transform: uppercase;
-  background-image: url('/wp-content/plugins/skallar-form-v6/assets/images/line-title.webp');
+  background-image: url('../images/line-title.webp');
   background-repeat: no-repeat;
   background-position: bottom left;
   padding-bottom: 16px;
@@ -33,6 +33,9 @@ body {
   max-width: 564px;
   margin: 0 auto;
   padding: 16px;
+}
+.f-container > div{
+  width: 100%;
 }
 .f-flex {
   display: flex;
@@ -95,7 +98,7 @@ input[type='range']::-webkit-slider-thumb {
   margin-top: -16px;
   height: 40px;
   width: 40px;
-  background-image: url('/wp-content/plugins/skallar-form-v6/assets/images/icon.svg');
+  background-image: url('../images/icon.svg');
   background-repeat: no-repeat;
   border-radius: 50%;
   transition: all ease-in-out 300ms;
@@ -120,6 +123,7 @@ form label {
   display: flex;
   flex-direction: column;
   font-size: 12px;
+  position: relative;
 }
 form label span {
   margin-bottom: -12px;
@@ -130,16 +134,30 @@ form label span {
   padding: 4px;
   font-size: 12px;
 }
-
-form input,.btn {
+form label i {
+  color: red;
+  position: absolute;
+  top: -8px;
+  right: 0;
+  
+}
+form input,.checks-box input,
+.btn {
   width: 100%;
   height: 36px;
   padding: 4px;
   border-radius: 4px;
   border: 1px #ccc solid;
+  transition: all 250ms ease-in-out;
   margin-bottom: 16px;
 }
-form input[type='checkbox'] {
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px rgb(255, 255, 255) inset;
+}
+.checks-box input[type='checkbox'] {
   width: 16px;
   height: 16px;
   margin: 0 8px;
@@ -151,17 +169,17 @@ form input[type='checkbox'] {
   border-radius: 50%;
 }
 
-form input[type='checkbox']::before {
+.checks-box input[type='checkbox']::before {
   content: '';
   width: 16px;
   height: 16px;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
-  background-image: url('/wp-content/plugins/skallar-form-v6/assets/images/check.svg');
+  background-image: url('../images/check.svg');
   background-size: contain;
 }
 
-form input[type='checkbox']:checked::before {
+.checks-box input[type='checkbox']:checked::before {
   transform: scale(1.2);
 }
 
@@ -176,6 +194,7 @@ form input[type='checkbox']:checked::before {
 .btn {
   background: #407bff;
   color: #fff;
+  text-transform: uppercase;
 }
 footer {
   background: #407bff;

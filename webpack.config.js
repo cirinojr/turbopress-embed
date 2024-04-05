@@ -12,5 +12,7 @@ module.exports = {
    entry: {
        ...getWebpackEntryPoints(),
        blocks: './blocks/index.js',
+       form: './assets/scripts/form-submit.js',
+       form_css: './assets/styles/form.scss'
    },
 };

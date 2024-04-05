@@ -25,5 +25,27 @@ export default {
       x: 50,
       y: 50,
     },
+  },
+
+  image2: {
+    type: 'object',
+    default: {
+      id: '',
+      src: '/wp-content/plugins/skallar-form-v6/assets/images/range.webp',
+      alt: '',
+      x: 50,
+      y: 50,
+    },
+  },
+
+  image3: {
+    type: 'object',
+    default: {
+      id: '',
+      src: '/wp-content/plugins/skallar-form-v6/assets/images/checks.webp',
+      alt: '',
+      x: 50,
+      y: 50,
+    },
   }
 };
