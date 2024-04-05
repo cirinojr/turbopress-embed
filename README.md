@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # skallar-form-v6
 
 
@@ -91,3 +92,29 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+=======
+# TurboPress Embed
+
+![TurboPress](https://claudiocirino.com/wp-content/uploads/2023/10/topo.png "TurboPress")
+
+### TurboPress Embed
+
+It is a Wordpress Gutenberg plugin that creates static content for your embedded video
+
+### Benefits
+
+- Reduction of unnecessary requests
+- Increased Score on Google Core Web Vitals
+### What embedded content does this plugin support?
+
+YouTube
+Vimeo
+Spotify
+
+# How it works?
+
+It's very easy, when adding the url to the block the plugin creates a static version of the embedded content based on the data returned by the url
+
+
+[![TurboPress](https://claudiocirino.com/wp-content/uploads/2023/10/turbo.png)](https://claudiocirino.com/wp-content/uploads/2023/10/turbopress-1.mp4 "TurboPress embed")
+>>>>>>> 24110ecb766ae3e8b2f0f53831dc71eabfd2bd02
