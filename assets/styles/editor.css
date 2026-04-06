@@ -1,36 +1,24 @@
-.tbe-yt-editor{
+.turbopress-embed.is-editor,
+.turbopress-embed.is-editor * {
+  box-sizing: border-box;
+}
+
+.turbopress-embed.is-editor .turbopress-embed__placeholder {
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 20px;
+}
+
+.turbopress-embed.is-editor .turbopress-embed__controls {
   width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.turbopress-embed.is-editor .turbopress-embed__editor-actions {
+  margin-top: 12px;
   display: flex;
   align-items: center;
-  flex-direction:column;
-}
-.tbe-yt-editor .label{
-  display: flex;
-  align-items: center;
-}
-.tbe-yt-editor .label svg{
-  width: 64px;
-  height: 64px;
-}
-
-.tbe-yt-editor .input-wrapper{
-  width: 100%;
-}
-.tbe-yt-editor .input-wrapper input{
-  width: 85%;
-  max-width: 550px;
-}
-
-.tbe-yt-editor .input-wrapper .epg-youtube-bt{
-  font-size: smaller;
-  margin: 8px;
-  background: #007cba;
-  color: #fff;
-  border: 0;
-  padding: 6px;
-  border-radius: 2px;
-}
-
-.epg-alert{
-  color: #f31e1e;
+  gap: 10px;
 }

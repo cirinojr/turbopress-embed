@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "tpe/soundcloud",
+  "version": "1.0.0",
+  "title": "TurboPress SoundCloud",
+  "category": "embed",
+  "icon": "format-audio",
+  "description": "SoundCloud preview card with click-to-load embed.",
+  "keywords": ["soundcloud", "embed", "audio", "performance"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-embed-editor",
+  "editorStyle": "turbopress-embed-editor-style",
+  "style": "turbopress-embed-soundcloud-style",
+  "viewScript": "turbopress-embed-soundcloud-view",
+  "attributes": {
+    "url": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "authorName": {
+      "type": "string",
+      "default": ""
+    },
+    "thumbnailUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "playerUrl": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

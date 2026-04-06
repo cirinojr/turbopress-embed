@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "tpe/youtube",
+  "version": "1.0.0",
+  "title": "TurboPress YouTube",
+  "category": "embed",
+  "icon": "video-alt3",
+  "description": "YouTube preview card with click-to-load embed.",
+  "keywords": ["youtube", "embed", "performance"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-embed-editor",
+  "editorStyle": "turbopress-embed-editor-style",
+  "style": "turbopress-embed-youtube-style",
+  "viewScript": "turbopress-embed-youtube-view",
+  "attributes": {
+    "url": {
+      "type": "string",
+      "default": ""
+    },
+    "videoId": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "thumbnailUrl": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

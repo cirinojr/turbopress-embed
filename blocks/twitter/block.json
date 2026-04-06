@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "tpe/twitter",
+  "version": "1.0.0",
+  "title": "TurboPress X / Twitter",
+  "category": "embed",
+  "icon": "twitter",
+  "description": "X/Twitter preview card with click-to-load embed.",
+  "keywords": ["twitter", "x", "embed", "performance"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-embed-editor",
+  "editorStyle": "turbopress-embed-editor-style",
+  "style": "turbopress-embed-twitter-style",
+  "viewScript": "turbopress-embed-twitter-view",
+  "attributes": {
+    "url": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "authorName": {
+      "type": "string",
+      "default": ""
+    },
+    "embedHtml": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

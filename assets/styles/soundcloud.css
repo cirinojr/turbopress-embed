@@ -1,0 +1,110 @@
+.turbopress-embed--soundcloud {
+  --tpe-surface: #141414;
+  --tpe-fg: #ffffff;
+  --tpe-muted: rgb(255 255 255 / 76%);
+  --tpe-focus: #fb923c;
+  --tpe-accent: #f97316;
+  --tpe-soundcloud-thumb: none;
+}
+
+.turbopress-embed--soundcloud,
+.turbopress-embed--soundcloud * {
+  box-sizing: border-box;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__card,
+.turbopress-embed--soundcloud .turbopress-embed__frame {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--tpe-surface);
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__trigger {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 180px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  color: var(--tpe-fg);
+  background: var(--tpe-surface);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__thumb {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  background-color: #212121;
+  background-image: var(--tpe-soundcloud-thumb);
+  background-size: cover;
+  background-position: center;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__meta {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__provider {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--tpe-muted);
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__title {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__hint {
+  font-size: 14px;
+  color: var(--tpe-muted);
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__play {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--tpe-accent);
+  color: #fff;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__trigger:focus-visible {
+  outline: 2px solid var(--tpe-focus);
+  outline-offset: -2px;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__frame {
+  aspect-ratio: 16 / 4;
+}
+
+.turbopress-embed--soundcloud .turbopress-embed__iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 680px) {
+  .turbopress-embed--soundcloud .turbopress-embed__trigger {
+    grid-template-columns: 1fr;
+  }
+}

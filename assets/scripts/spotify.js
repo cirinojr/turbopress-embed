@@ -1,9 +1,29 @@
-const player=document.querySelectorAll('.spotify-card');
-player.forEach((p)=>{
-  p.addEventListener('click',()=>{
-    const videoId=p.getAttribute('spotifyembed');
-    const url=videoId.replace('https://open.spotify.com/', 'https://open.spotify.com/embed/');
-    const playerOutput=`<iframe style="border-radius:12px" src="${url}?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-    p.innerHTML=playerOutput;
-  });
-});
+const getEmbedUrl = (url) => url.replace('https://open.spotify.com/', 'https://open.spotify.com/embed/');
+
+const mountSpotifyPlayer = (root) => {
+  const trigger = root.querySelector('.turbopress-embed__trigger');
+  const sourceUrl = root.dataset.embedUrl;
+
+  if (!trigger || !sourceUrl) {
+    return;
+  }
+
+  trigger.addEventListener('click', () => {
+    const frame = document.createElement('iframe');
+    frame.className = 'turbopress-embed__iframe';
+    frame.src = `${getEmbedUrl(sourceUrl)}?utm_source=turbopress_embed`;
+    frame.title = root.querySelector('.turbopress-embed__title')?.textContent || 'Spotify player';
+    frame.loading = 'lazy';
+    frame.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    frame.setAttribute('allowfullscreen', '');
+
+    const frameWrapper = document.createElement('div');
+    frameWrapper.className = 'turbopress-embed__frame';
+    frameWrapper.appendChild(frame);
+
+    root.replaceChildren(frameWrapper);
+    root.classList.add('is-loaded');
+  }, { once: true });
+};
+
+document.querySelectorAll('.turbopress-embed--spotify').forEach(mountSpotifyPlayer);

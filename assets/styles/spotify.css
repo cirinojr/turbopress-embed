@@ -1,69 +1,122 @@
-.spotify-card{
+.turbopress-embed--spotify {
+  --tpe-spotify-bg: #121212;
+  --tpe-spotify-fg: #ffffff;
+  --tpe-spotify-accent: #1db954;
+  --tpe-focus: #86efac;
+  --tpe-spotify-thumb: none;
+}
+
+.turbopress-embed--spotify,
+.turbopress-embed--spotify * {
+  box-sizing: border-box;
+}
+
+.turbopress-embed--spotify .turbopress-embed__card,
+.turbopress-embed--spotify .turbopress-embed__frame {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--tpe-spotify-bg);
+}
+
+.turbopress-embed--spotify .turbopress-embed__trigger {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: clamp(16px, 3vw, 24px);
+  width: 100%;
+  min-height: 228px;
   display: grid;
-  grid-template-columns: -webkit-min-content auto;
-  grid-template-columns: min-content auto;
-  padding: 40px;
-  grid-column-gap: 24px;
-  height: 352px;
-  color:#fff !important;
-  border-radius: 12px;
-  cursor: pointer;
-}
-.spotify-card a{
-  display: inline;
-  display: initial;
-  white-space: nowrap;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  color:#fff;
-  font-family: sans-serif;
-  font-weight: 600;
-  font-size: 1.5rem;
-  text-decoration: none;
-}
-
-.spotify-card .right{
-  display: flex;
-  justify-content: flex-end;
+  grid-template-columns: minmax(100px, 180px) 1fr auto;
   align-items: center;
+  gap: clamp(12px, 2vw, 20px);
+  color: var(--tpe-spotify-fg);
+  background: var(--tpe-spotify-bg);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
 }
-.spotify-card .sp-wrapper{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  white-space: nowrap;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
+
+.turbopress-embed--spotify .turbopress-embed__thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #111;
+  background-image: var(--tpe-spotify-thumb);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 35%);
 }
-.spotify-card .content{
-  display: flex;
-  flex-direction: column;
+
+.turbopress-embed--spotify .turbopress-embed__meta {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
 }
-.spotify-card .content a, .spotify-card .content a:hover{
-  color: #fff;
-}
-.spotify-card svg{
-  fill:#fff
-}
-.spotify-card span{
-  opacity: .7;
-  margin-right: 24px;
-}
-.spotify-card button{
-  width: fit-content;
-}
-.time{
+
+.turbopress-embed--spotify .turbopress-embed__provider {
   font-size: 12px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgb(255 255 255 / 75%);
 }
-.spotify-card .cover{
 
+.turbopress-embed--spotify .turbopress-embed__title {
+  font-size: clamp(16px, 2.3vw, 24px);
+  line-height: 1.3;
+  font-weight: 700;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.spotify-card .cover img{
-  max-width: 272px;
-  max-height: 272px;
-  min-width: 120px;
-  min-height: 120px;
-  border-radius: 12px;
-  box-shadow: 0 9px 9px 0 rgba(0,0,0,.1), 0 0 29px 0 rgba(0,0,0,.1);
+.turbopress-embed--spotify .turbopress-embed__hint {
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 82%);
+}
+
+.turbopress-embed--spotify .turbopress-embed__play {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #03170a;
+  background: var(--tpe-spotify-accent);
+  transition: transform 0.2s ease;
+}
+
+.turbopress-embed--spotify .turbopress-embed__trigger:hover .turbopress-embed__play,
+.turbopress-embed--spotify .turbopress-embed__trigger:focus-visible .turbopress-embed__play {
+  transform: scale(1.07);
+}
+
+.turbopress-embed--spotify .turbopress-embed__trigger:focus-visible {
+  outline: 2px solid var(--tpe-focus);
+  outline-offset: -2px;
+}
+
+.turbopress-embed--spotify .turbopress-embed__frame {
+  aspect-ratio: 16 / 9;
+}
+
+.turbopress-embed--spotify .turbopress-embed__iframe {
+  border: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 700px) {
+  .turbopress-embed--spotify .turbopress-embed__trigger {
+    grid-template-columns: 1fr;
+  }
+
+  .turbopress-embed--spotify .turbopress-embed__thumb {
+    max-width: 160px;
+  }
 }

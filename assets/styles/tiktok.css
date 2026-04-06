@@ -1,0 +1,276 @@
+.turbopress-embed--tiktok {
+  --tpe-surface: #0f172a;
+  --tpe-fg: #ffffff;
+  --tpe-focus: #67e8f9;
+  --tpe-thumb-image: none;
+  --tpe-card-width: min(380px, 100%);
+  transition: height 0.26s ease;
+}
+
+.turbopress-embed--tiktok.is-swapping {
+  overflow: hidden;
+}
+
+.turbopress-embed--tiktok,
+.turbopress-embed--tiktok * {
+  box-sizing: border-box;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__card,
+.turbopress-embed--tiktok .turbopress-embed__frame {
+  width: var(--tpe-card-width);
+  max-width: 100%;
+  margin-inline: auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__trigger {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto auto;
+  cursor: pointer;
+  text-align: left;
+  color: #0f172a;
+  background: transparent;
+  font: inherit;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__media-wrap {
+  position: relative;
+  display: block;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__topbar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 45%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__brand {
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  background: rgb(15 23 42 / 70%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__rail {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-40%);
+  z-index: 3;
+  display: grid;
+  gap: 12px;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__rail-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgb(241 245 249 / 78%);
+  border: 1px solid rgb(255 255 255 / 55%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__subtitle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  z-index: 3;
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 58%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__media {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, #1f2937 0, #0f172a 40%);
+  background-image: var(--tpe-thumb-image);
+  background-size: cover;
+  background-position: center;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 16%) 40%, rgb(0 0 0 / 85%) 100%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__meta {
+  display: none;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary-button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #be123c;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__provider {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary-title {
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #0f172a;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary-author {
+  font-size: 15px;
+  line-height: 1.2;
+  color: #334155;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__summary-music {
+  font-size: 14px;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #0369a1;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__trigger:focus-visible {
+  outline: 2px solid var(--tpe-focus);
+  outline-offset: -2px;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.turbopress-embed--tiktok.has-stable-height {
+  height: var(--tpe-stable-height);
+}
+
+.turbopress-embed--tiktok.has-stable-height .turbopress-embed__frame {
+  height: 100%;
+}
+
+.turbopress-embed--tiktok.has-stable-height .turbopress-embed__frame .tiktok-embed {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+.turbopress-embed--tiktok.has-stable-height .turbopress-embed__frame iframe {
+  height: 100% !important;
+}
+
+.turbopress-embed--tiktok.is-loaded .turbopress-embed__frame {
+  width: var(--tpe-card-width);
+  max-width: 100%;
+  margin-inline: auto;
+  aspect-ratio: auto;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 14px;
+}
+
+.turbopress-embed--tiktok.is-loaded .turbopress-embed__frame .tiktok-embed {
+  margin: 0 auto !important;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__fallback {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #e2e8f0;
+  background: rgb(2 6 23 / 62%);
+}
+
+.turbopress-embed--tiktok .turbopress-embed__fallback-link {
+  color: #67e8f9;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.turbopress-embed--tiktok .turbopress-embed__fallback-link:focus-visible {
+  outline: 2px solid #67e8f9;
+  outline-offset: 2px;
+  border-radius: 2px;
+}

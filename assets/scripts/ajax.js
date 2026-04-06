@@ -1,28 +1,33 @@
-const fetchData = async (action,id) => {
-  const url = ajax_object.ajax_url;
+const fetchData = async (action, payload = {}) => {
+  const normalizedPayload =
+    typeof payload === 'string'
+      ? { url: payload }
+      : payload;
+
   try {
-    const response = await fetch(url, {
+    const response = await fetch(turbopressEmbedConfig.ajaxUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        'action': action,
-        'id': id,
-        'nonce': ajax_object.nonce
-    })
-  });
+        action,
+        nonce: turbopressEmbedConfig.nonce,
+        ...normalizedPayload,
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error('Internet connection error!');
+      throw new Error('Request failed');
     }
 
-    const data = await response.text();
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error('Fetch error:', error);
+    return {
+      success: false,
+      message: error.message,
+    };
   }
-  return false;
 };
 
 export default fetchData;

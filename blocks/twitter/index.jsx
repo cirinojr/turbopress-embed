@@ -4,7 +4,7 @@ import Edit from './edit';
 import Save from './save';
 
 registerBlockType(metadata.name, {
-    ...metadata,
-    edit: Edit,
-    save: Save,
+  ...metadata,
+  edit: Edit,
+  save: Save,
 });

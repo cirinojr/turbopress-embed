@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "tpe/spotify",
+  "version": "1.0.0",
+  "title": "TurboPress Spotify",
+  "category": "embed",
+  "icon": "format-audio",
+  "description": "Spotify preview card with click-to-load embed.",
+  "keywords": ["spotify", "embed", "performance"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-embed-editor",
+  "editorStyle": "turbopress-embed-editor-style",
+  "style": "turbopress-embed-spotify-style",
+  "viewScript": "turbopress-embed-spotify-view",
+  "attributes": {
+    "url": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "thumbnailUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "backgroundColor": {
+      "type": "string",
+      "default": "#121212"
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}
