@@ -18,6 +18,18 @@
       "type": "string",
       "default": ""
     },
+    "spotifyType": {
+      "type": "string",
+      "default": ""
+    },
+    "spotifyId": {
+      "type": "string",
+      "default": ""
+    },
+    "embedUrl": {
+      "type": "string",
+      "default": ""
+    },
     "title": {
       "type": "string",
       "default": ""

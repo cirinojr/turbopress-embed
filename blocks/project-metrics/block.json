@@ -1,0 +1,22 @@
+{
+  "apiVersion": 2,
+  "name": "tpe/project-metrics",
+  "version": "1.0.0",
+  "title": "Project Metrics",
+  "category": "embed",
+  "icon": "chart-bar",
+  "description": "Communicate measurable project outcomes.",
+  "keywords": ["TurboPress", "project", "metrics"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-portfolio-editor",
+  "style": "turbopress-portfolio-style",
+  "attributes": {
+    "metrics": { "type": "array", "default": [] },
+    "hideBefore": { "type": "boolean", "default": false },
+    "autoCalculate": { "type": "boolean", "default": true },
+    "layout": { "type": "string", "default": "metrics-grid" },
+    "theme": { "type": "string", "default": "auto" },
+    "density": { "type": "string", "default": "comfortable" }
+  },
+  "supports": { "html": false }
+}

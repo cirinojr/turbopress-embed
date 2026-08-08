@@ -29,6 +29,54 @@
     "thumbnailUrl": {
       "type": "string",
       "default": ""
+    },
+    "channelName": {
+      "type": "string",
+      "default": ""
+    },
+    "channelId": {
+      "type": "string",
+      "default": ""
+    },
+    "channelUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "channelThumbnail": {
+      "type": "string",
+      "default": ""
+    },
+    "subscriberText": {
+      "type": "string",
+      "default": ""
+    },
+    "channelVerified": {
+      "type": "boolean",
+      "default": false
+    },
+    "durationText": {
+      "type": "string",
+      "default": ""
+    },
+    "viewCountText": {
+      "type": "string",
+      "default": ""
+    },
+    "relativeDateText": {
+      "type": "string",
+      "default": ""
+    },
+    "playableInEmbed": {
+      "type": "boolean",
+      "default": true
+    },
+    "showWatchButton": {
+      "type": "boolean",
+      "default": true
+    },
+    "watchButtonLabel": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {

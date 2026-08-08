@@ -22,6 +22,8 @@
 
 defined('ABSPATH') || exit;
 
+require_once __DIR__ . '/includes/class-turbopress-remote-data.php';
+
 final class TurboPress
 {
     private const VERSION = '1.0.0';
@@ -48,6 +50,7 @@ final class TurboPress
         add_action('wp_ajax_tpe_get_tiktok', array($this, 'getTikTok'));
         add_action('wp_ajax_tpe_get_twitter', array($this, 'getTwitter'));
         add_action('wp_ajax_tpe_get_soundcloud', array($this, 'getSoundCloud'));
+        TurboPress_Remote_Data::init();
     }
 
     public function registerAssetsAndBlocks()
@@ -151,11 +154,70 @@ final class TurboPress
             self::VERSION
         );
 
+        $portfolio_asset_file = __DIR__ . '/build/portfolio.asset.php';
+        $portfolio_asset = file_exists($portfolio_asset_file)
+            ? require $portfolio_asset_file
+            : array(
+                'dependencies' => array('wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element'),
+                'version' => self::VERSION,
+            );
+        $portfolio_asset['dependencies'] = array_values(array_unique(array_merge(
+            $portfolio_asset['dependencies'],
+            array('wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element')
+        )));
+
+        wp_register_script(
+            'turbopress-portfolio-editor',
+            plugins_url('build/portfolio.js', __FILE__),
+            $portfolio_asset['dependencies'],
+            $portfolio_asset['version'],
+            true
+        );
+
+        wp_localize_script(
+            'turbopress-portfolio-editor',
+            'turbopressPortfolio',
+            array(
+                'restUrl' => esc_url_raw(rest_url(TurboPress_Remote_Data::REST_NAMESPACE . '/')),
+                'nonce' => wp_create_nonce('wp_rest'),
+            )
+        );
+
+        wp_register_style(
+            'turbopress-portfolio-style',
+            plugins_url('build/portfolio.css', __FILE__),
+            array(),
+            $portfolio_asset['version']
+        );
+
+        wp_register_script(
+            'turbopress-portfolio-code-view',
+            plugins_url('build/portfolio_view.js', __FILE__),
+            array(),
+            $portfolio_asset['version'],
+            true
+        );
+
         register_block_type(__DIR__ . '/blocks/youtube');
         register_block_type(__DIR__ . '/blocks/spotify');
         register_block_type(__DIR__ . '/blocks/tiktok');
         register_block_type(__DIR__ . '/blocks/twitter');
         register_block_type(__DIR__ . '/blocks/soundcloud');
+
+        $portfolio_blocks = array(
+            'github-project',
+            'github-code',
+            'tech-stack',
+            'project-case-study',
+            'project-metrics',
+        );
+
+        foreach ($portfolio_blocks as $portfolio_block) {
+            register_block_type(
+                __DIR__ . '/blocks/' . $portfolio_block,
+                array('render_callback' => array('TurboPress_Remote_Data', 'render_dynamic_block'))
+            );
+        }
     }
 
     public function getYoutube()
@@ -210,10 +272,32 @@ final class TurboPress
 
     private function resolveProviderMetadata($provider, $url)
     {
+        if ('youtube' === $provider) {
+            $metadata = TurboPress_Remote_Data::get_youtube_metadata($url);
+
+            if (is_wp_error($metadata)) {
+                $code = 'turbopress_invalid_youtube_url' === $metadata->get_error_code()
+                    ? 'invalid_url'
+                    : 'remote_error';
+                return $this->errorResult($code, __('Unable to load YouTube metadata.', 'turbopress-embed'));
+            }
+
+            return $metadata;
+        }
+
         $config = $this->getProviderConfig($provider);
 
         if (empty($config)) {
             return $this->errorResult('invalid_provider', __('Unsupported provider.', 'turbopress-embed'));
+        }
+
+        if ('spotify' === $provider) {
+            $spotify_resource = $this->parseSpotifyUrl($url);
+            if (empty($spotify_resource)) {
+                return $this->errorResult('invalid_url', __('Invalid Spotify URL.', 'turbopress-embed'));
+            }
+
+            $url = $this->getSpotifyPublicUrl($spotify_resource);
         }
 
         if (!$this->isSupportedHost($url, $config['hosts'])) {
@@ -268,10 +352,6 @@ final class TurboPress
 
     private function normalizeProviderPayload($provider, $url, $data)
     {
-        if ('youtube' === $provider) {
-            return $this->normalizeYoutubePayload($url, $data);
-        }
-
         if ('spotify' === $provider) {
             return $this->normalizeSpotifyPayload($url, $data);
         }
@@ -291,36 +371,67 @@ final class TurboPress
         return $this->errorResult('invalid_provider', __('Unsupported provider.', 'turbopress-embed'));
     }
 
-    private function normalizeYoutubePayload($url, $data)
-    {
-        $title = isset($data['title']) ? sanitize_text_field($data['title']) : '';
-        $thumb = isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '';
-
-        if ('' === $title && '' === $thumb) {
-            return $this->errorResult('remote_error', __('YouTube did not return enough preview data.', 'turbopress-embed'));
-        }
-
-        return array(
-            'provider'  => 'youtube',
-            'url'       => $url,
-            'title'     => $title,
-            'thumbnail' => $thumb,
-        );
-    }
-
     private function normalizeSpotifyPayload($url, $data)
     {
+        $resource = $this->parseSpotifyUrl($url);
         $title = isset($data['title']) ? sanitize_text_field($data['title']) : '';
-        if ('' === $title) {
+        if (empty($resource) || '' === $title) {
             return $this->errorResult('remote_error', __('Spotify did not return enough preview data.', 'turbopress-embed'));
         }
 
         return array(
             'provider'  => 'spotify',
-            'url'       => $url,
+            'url'       => $this->getSpotifyPublicUrl($resource),
+            'type'      => $resource['type'],
+            'id'        => $resource['id'],
+            'embedUrl'  => $this->getSpotifyEmbedUrl($resource),
             'title'     => $title,
             'thumbnail' => isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
         );
+    }
+
+    private function parseSpotifyUrl($url)
+    {
+        $parts = wp_parse_url($url);
+        if (
+            !is_array($parts) ||
+            !isset($parts['scheme'], $parts['host'], $parts['path']) ||
+            'https' !== strtolower($parts['scheme']) ||
+            'open.spotify.com' !== strtolower($parts['host'])
+        ) {
+            return null;
+        }
+
+        $path_parts = array_values(array_filter(explode('/', trim($parts['path'], '/')), 'strlen'));
+        $is_embed   = isset($path_parts[0]) && 'embed' === $path_parts[0];
+        $type_index = $is_embed ? 1 : 0;
+        $id_index   = $is_embed ? 2 : 1;
+        $type       = isset($path_parts[$type_index]) ? $path_parts[$type_index] : '';
+        $id         = isset($path_parts[$id_index]) ? $path_parts[$id_index] : '';
+        $types      = array('track', 'album', 'playlist', 'episode', 'artist', 'show');
+        $expected   = $is_embed && 'show' === $type ? 4 : ($is_embed ? 3 : 2);
+
+        if (
+            count($path_parts) !== $expected ||
+            !in_array($type, $types, true) ||
+            !preg_match('/^[A-Za-z0-9]{10,64}$/', $id) ||
+            ($is_embed && 'show' === $type && 'video' !== $path_parts[3])
+        ) {
+            return null;
+        }
+
+        return array('type' => $type, 'id' => $id);
+    }
+
+    private function getSpotifyPublicUrl($resource)
+    {
+        return 'https://open.spotify.com/' . $resource['type'] . '/' . $resource['id'];
+    }
+
+    private function getSpotifyEmbedUrl($resource)
+    {
+        $suffix = 'show' === $resource['type'] ? '/video' : '';
+        return 'https://open.spotify.com/embed/' . $resource['type'] . '/' . $resource['id'] . $suffix;
     }
 
     private function normalizeTikTokPayload($url, $data)
@@ -432,11 +543,6 @@ final class TurboPress
     private function getProviderConfig($provider)
     {
         $providers = array(
-            'youtube'    => array(
-                'endpoint'   => 'https://www.youtube.com/oembed',
-                'query_args' => array('format' => 'json'),
-                'hosts'      => array('youtube.com', 'youtu.be'),
-            ),
             'spotify'    => array(
                 'endpoint'   => 'https://open.spotify.com/oembed',
                 'query_args' => array(),

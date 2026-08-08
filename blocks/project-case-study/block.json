@@ -1,0 +1,31 @@
+{
+  "apiVersion": 2,
+  "name": "tpe/project-case-study",
+  "version": "1.0.0",
+  "title": "Developer Project Case Study",
+  "category": "embed",
+  "icon": "media-document",
+  "description": "Create a professional developer project case study.",
+  "keywords": ["TurboPress", "portfolio", "case study"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-portfolio-editor",
+  "style": "turbopress-portfolio-style",
+  "attributes": {
+    "projectTitle": { "type": "string", "default": "" },
+    "summary": { "type": "string", "default": "" },
+    "role": { "type": "string", "default": "" },
+    "company": { "type": "string", "default": "" },
+    "date": { "type": "string", "default": "" },
+    "projectUrl": { "type": "string", "default": "" },
+    "repositoryUrl": { "type": "string", "default": "" },
+    "challenge": { "type": "string", "default": "" },
+    "solution": { "type": "string", "default": "" },
+    "result": { "type": "string", "default": "" },
+    "technologies": { "type": "array", "default": [] },
+    "featuredImageUrl": { "type": "string", "default": "" },
+    "layout": { "type": "string", "default": "case-study" },
+    "theme": { "type": "string", "default": "auto" },
+    "density": { "type": "string", "default": "comfortable" }
+  },
+  "supports": { "html": false }
+}

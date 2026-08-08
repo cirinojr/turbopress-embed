@@ -1,0 +1,31 @@
+{
+  "apiVersion": 2,
+  "name": "tpe/github-code",
+  "version": "1.0.0",
+  "title": "GitHub Code Showcase",
+  "category": "embed",
+  "icon": "editor-code",
+  "description": "Show an escaped source-code excerpt from GitHub.",
+  "keywords": ["TurboPress", "GitHub", "code"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-portfolio-editor",
+  "viewScript": "turbopress-portfolio-code-view",
+  "style": "turbopress-portfolio-style",
+  "attributes": {
+    "repositoryUrl": { "type": "string", "default": "" },
+    "branch": { "type": "string", "default": "" },
+    "filePath": { "type": "string", "default": "" },
+    "startLine": { "type": "number", "default": 1 },
+    "endLine": { "type": "number", "default": 30 },
+    "highlightedLines": { "type": "string", "default": "" },
+    "title": { "type": "string", "default": "" },
+    "description": { "type": "string", "default": "" },
+    "showFilename": { "type": "boolean", "default": true },
+    "showLineNumbers": { "type": "boolean", "default": true },
+    "showGithubLink": { "type": "boolean", "default": true },
+    "maxHeight": { "type": "number", "default": 480 },
+    "theme": { "type": "string", "default": "auto" },
+    "density": { "type": "string", "default": "comfortable" }
+  },
+  "supports": { "html": false }
+}

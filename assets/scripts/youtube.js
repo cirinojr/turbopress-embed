@@ -1,28 +1,52 @@
-const mountYoutubePlayer = (root) => {
-  const trigger = root.querySelector('.turbopress-embed__trigger');
+const mountYoutubePlayer = ( root ) => {
+  const trigger = root.querySelector( '.turbopress-embed__trigger' );
   const videoId = root.dataset.videoId;
 
-  if (!trigger || !videoId) {
+  if ( ! trigger || ! videoId || root.dataset.playableInEmbed === 'false' ) {
     return;
   }
 
-  trigger.addEventListener('click', () => {
-    const frame = document.createElement('iframe');
-    frame.className = 'turbopress-embed__iframe';
-    frame.src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0`;
-    frame.title = root.querySelector('.turbopress-embed__title')?.textContent || 'YouTube video player';
-    frame.loading = 'lazy';
-    frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-    frame.allowFullscreen = true;
+  const avatar = root.querySelector( '.turbopress-embed__channel-avatar' );
+  if ( avatar ) {
+    const hideBrokenAvatar = () => {
+      avatar.hidden = true;
+    };
+    if ( avatar.complete && avatar.naturalWidth === 0 ) {
+      hideBrokenAvatar();
+    } else {
+      avatar.addEventListener( 'error', hideBrokenAvatar, { once: true } );
+    }
+  }
 
-    const frameWrapper = document.createElement('div');
-    frameWrapper.className = 'turbopress-embed__frame';
-    frameWrapper.appendChild(frame);
+  trigger.addEventListener(
+    'click',
+    () => {
+      const frame = document.createElement( 'iframe' );
+      frame.className = 'turbopress-embed__iframe';
+      frame.src = `https://www.youtube-nocookie.com/embed/${ encodeURIComponent(
+        videoId,
+      ) }?autoplay=1&rel=0`;
+      const title =
+        root.querySelector( '.turbopress-embed__title' )?.textContent ||
+        'video';
+      frame.title = `YouTube video: ${ title }`;
+      frame.loading = 'lazy';
+      frame.allow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      frame.allowFullscreen = true;
 
-    root.replaceChildren(frameWrapper);
-    root.classList.add('is-loaded');
-  }, { once: true });
+      const frameWrapper = document.createElement( 'div' );
+      frameWrapper.className = 'turbopress-embed__frame';
+      frameWrapper.appendChild( frame );
+
+      root.replaceChildren( frameWrapper );
+      root.classList.add( 'is-loaded' );
+      frame.focus( { preventScroll: true } );
+    },
+    { once: true },
+  );
 };
 
-document.querySelectorAll('.turbopress-embed--youtube').forEach(mountYoutubePlayer);
-
+document
+  .querySelectorAll( '.turbopress-embed--youtube' )
+  .forEach( mountYoutubePlayer );

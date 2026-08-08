@@ -1,0 +1,24 @@
+{
+  "apiVersion": 2,
+  "name": "tpe/tech-stack",
+  "version": "1.0.0",
+  "title": "Tech Stack",
+  "category": "embed",
+  "icon": "admin-tools",
+  "description": "Present technologies manually or from GitHub languages.",
+  "keywords": ["TurboPress", "developer", "tech stack"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-portfolio-editor",
+  "style": "turbopress-portfolio-style",
+  "attributes": {
+    "mode": { "type": "string", "default": "manual" },
+    "repositoryUrl": { "type": "string", "default": "" },
+    "technologies": { "type": "array", "default": [] },
+    "showPercentages": { "type": "boolean", "default": true },
+    "maxLanguages": { "type": "number", "default": 6 },
+    "layout": { "type": "string", "default": "badges" },
+    "theme": { "type": "string", "default": "auto" },
+    "density": { "type": "string", "default": "comfortable" }
+  },
+  "supports": { "html": false }
+}

@@ -1,0 +1,31 @@
+{
+  "apiVersion": 2,
+  "name": "tpe/github-project",
+  "version": "1.0.0",
+  "title": "GitHub Project Showcase",
+  "category": "embed",
+  "icon": "portfolio",
+  "description": "Present a GitHub repository as a portfolio project.",
+  "keywords": ["TurboPress", "GitHub", "portfolio"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-portfolio-editor",
+  "style": "turbopress-portfolio-style",
+  "attributes": {
+    "repositoryUrl": { "type": "string", "default": "" },
+    "customTitle": { "type": "string", "default": "" },
+    "customDescription": { "type": "string", "default": "" },
+    "demoUrl": { "type": "string", "default": "" },
+    "showStars": { "type": "boolean", "default": true },
+    "showForks": { "type": "boolean", "default": true },
+    "showLanguage": { "type": "boolean", "default": true },
+    "showTopics": { "type": "boolean", "default": true },
+    "showLicense": { "type": "boolean", "default": true },
+    "showUpdatedDate": { "type": "boolean", "default": true },
+    "showRepositoryButton": { "type": "boolean", "default": true },
+    "showDemoButton": { "type": "boolean", "default": true },
+    "layout": { "type": "string", "default": "card" },
+    "theme": { "type": "string", "default": "auto" },
+    "density": { "type": "string", "default": "comfortable" }
+  },
+  "supports": { "html": false }
+}
