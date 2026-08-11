@@ -1,106 +1,90 @@
-import loadExternalScript from './utils/loadExternalScript';
-
-const createFallbackLink = (sourceUrl) => {
-  if (!sourceUrl) {
+const createFallbackLink = ( sourceUrl ) => {
+  if ( ! sourceUrl ) {
     return null;
   }
 
-  const wrapper = document.createElement('p');
+  const wrapper = document.createElement( 'p' );
   wrapper.className = 'turbopress-embed__fallback';
 
-  const text = document.createElement('span');
+  const text = document.createElement( 'span' );
   text.textContent = 'Se o video nao carregar, ';
 
-  const link = document.createElement('a');
+  const link = document.createElement( 'a' );
   link.className = 'turbopress-embed__fallback-link';
   link.href = sourceUrl;
   link.target = '_blank';
   link.rel = 'noopener noreferrer nofollow';
   link.textContent = 'abra no TikTok';
 
-  wrapper.append(text, link);
+  wrapper.append( text, link );
 
   return wrapper;
 };
 
-const lockSwapHeight = (root) => {
-  const lockedHeight = Math.ceil(root.getBoundingClientRect().height);
-
-  if (lockedHeight > 0) {
-    root.style.setProperty('--tpe-stable-height', `${lockedHeight}px`);
-    root.classList.add('has-stable-height');
-    root.style.height = `${lockedHeight}px`;
-    root.classList.add('is-swapping');
+const getVideoId = ( root ) => {
+  if ( /^[0-9]{10,30}$/.test( root.dataset.videoId || '' ) ) {
+    return root.dataset.videoId;
   }
 
-  return () => {
-    root.classList.remove('is-swapping');
-  };
+  return root.dataset.embedUrl?.match( /\/video\/([0-9]{10,30})/ )?.[ 1 ] || '';
 };
 
-const waitForIframeRender = (container, timeout = 5000) =>
-  new Promise((resolve) => {
-    if (container.querySelector('iframe')) {
-      resolve(true);
-      return;
-    }
-
-    const observer = new MutationObserver(() => {
-      if (!container.querySelector('iframe')) {
-        return;
-      }
-
-      observer.disconnect();
-      resolve(true);
-    });
-
-    observer.observe(container, { childList: true, subtree: true });
-
-    globalThis.setTimeout(() => {
-      observer.disconnect();
-      resolve(false);
-    }, timeout);
-  });
-
-const mountTikTokPlayer = (root) => {
-  const trigger = root.querySelector('.turbopress-embed__trigger');
-  const embedHtml = root.dataset.embedHtml;
+const mountTikTokPlayer = ( root ) => {
+  const trigger = root.querySelector( '.turbopress-embed__trigger' );
+  const mediaWrapper = root.querySelector( '.turbopress-embed__media-wrap' );
   const embedUrl = root.dataset.embedUrl;
+  const videoId = getVideoId( root );
 
-  if (!trigger || !embedHtml) {
+  if ( ! trigger || ! mediaWrapper || ! videoId ) {
     return;
   }
 
   trigger.addEventListener(
     'click',
-    async () => {
-      const unlockSwapHeight = lockSwapHeight(root);
-      const frameWrapper = document.createElement('div');
-      frameWrapper.className = 'turbopress-embed__frame';
-      frameWrapper.innerHTML = embedHtml;
-      const fallback = createFallbackLink(embedUrl);
-
-      root.replaceChildren(frameWrapper);
-      if (fallback) {
-        frameWrapper.appendChild(fallback);
+    () => {
+      if ( root.dataset.state !== 'preview' ) {
+        return;
       }
 
-      root.classList.add('is-loaded');
+      root.dataset.state = 'loading';
+      trigger.disabled = true;
+      const frameWrapper = document.createElement( 'div' );
+      frameWrapper.className = 'turbopress-embed__frame';
+      const player = document.createElement( 'iframe' );
+      player.className = 'turbopress-embed__iframe';
+      player.title = trigger.getAttribute( 'aria-label' ) || 'TikTok video';
+      player.allow = 'autoplay; fullscreen';
+      player.allowFullscreen = true;
+      const fallback = createFallbackLink( embedUrl );
 
-      try {
-        await loadExternalScript({ src: 'https://www.tiktok.com/embed.js' });
-        await waitForIframeRender(frameWrapper);
-      } catch (error) {
-        root.classList.add('is-error');
-        root.dataset.tpeScriptError = error instanceof Error ? error.message : 'unknown_error';
-      } finally {
-        globalThis.setTimeout(() => {
-          unlockSwapHeight();
-        }, 180);
+      player.addEventListener(
+        'load',
+        () => {
+          root.dataset.state = 'playing';
+          root.classList.add( 'is-loaded' );
+          player.focus( { preventScroll: true } );
+        },
+        { once: true },
+      );
+      player.addEventListener(
+        'error',
+        () => {
+          root.dataset.state = 'error';
+          root.classList.add( 'is-error' );
+        },
+        { once: true },
+      );
+      player.src = `https://www.tiktok.com/player/v1/${ videoId }?autoplay=1`;
+      frameWrapper.appendChild( player );
+      mediaWrapper.appendChild( frameWrapper );
+      if ( fallback ) {
+        frameWrapper.appendChild( fallback );
       }
     },
-    { once: true }
+    { once: true },
   );
 };
 
-document.querySelectorAll('.turbopress-embed--tiktok').forEach(mountTikTokPlayer);
+document
+  .querySelectorAll( '.turbopress-embed--tiktok' )
+  .forEach( mountTikTokPlayer );

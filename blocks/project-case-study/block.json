@@ -23,6 +23,8 @@
     "result": { "type": "string", "default": "" },
     "technologies": { "type": "array", "default": [] },
     "featuredImageUrl": { "type": "string", "default": "" },
+    "featuredImageAlt": { "type": "string", "default": "" },
+    "headingLevel": { "type": "number", "default": 2 },
     "layout": { "type": "string", "default": "case-study" },
     "theme": { "type": "string", "default": "auto" },
     "density": { "type": "string", "default": "comfortable" }

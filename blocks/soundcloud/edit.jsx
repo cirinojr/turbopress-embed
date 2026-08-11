@@ -2,10 +2,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import fetchData from '../../assets/scripts/ajax';
+import {
+  getSoundCloudPlayerUrl,
+  normalizeSoundCloudUrl,
+} from '../../assets/scripts/soundcloud-url';
 import { EmbedEditorActions, EmbedErrorNotice, EmbedUrlPlaceholder } from '../shared/editor-ui';
-
-const isValidSoundCloudUrl = (url) =>
-  /^https:\/\/(www\.)?soundcloud\.com\/.+|^https:\/\/on\.soundcloud\.com\/.+/i.test(url);
 
 const Edit = ({ attributes, setAttributes }) => {
   const { url, title, authorName, thumbnailUrl, playerUrl } = attributes;
@@ -19,9 +20,9 @@ const Edit = ({ attributes, setAttributes }) => {
   });
 
   const onEmbed = async () => {
-    const normalizedUrl = inputUrl.trim();
+    const normalizedUrl = normalizeSoundCloudUrl(inputUrl.trim());
 
-    if (!isValidSoundCloudUrl(normalizedUrl)) {
+    if (!normalizedUrl) {
       setError(__('Use a valid SoundCloud URL.', 'turbopress-embed'));
       return;
     }
@@ -41,7 +42,7 @@ const Edit = ({ attributes, setAttributes }) => {
         title: response.data?.title || __('SoundCloud track', 'turbopress-embed'),
         authorName: response.data?.authorName || '',
         thumbnailUrl: response.data?.thumbnail || '',
-        playerUrl: response.data?.playerUrl || '',
+        playerUrl: getSoundCloudPlayerUrl(normalizedUrl),
       });
     } catch (requestError) {
       setError(requestError.message);
@@ -87,7 +88,11 @@ const Edit = ({ attributes, setAttributes }) => {
         <button
           type="button"
           className="turbopress-embed__trigger"
-          aria-label={sprintf(__('Play "%s" on SoundCloud', 'turbopress-embed'), title || __('track', 'turbopress-embed'))}
+          aria-label={sprintf(
+            // translators: %s is the SoundCloud track title.
+            __('Play "%s" on SoundCloud', 'turbopress-embed'),
+            title || __('track', 'turbopress-embed'),
+          )}
         >
           <span className="turbopress-embed__thumb" aria-hidden="true" />
           <span className="turbopress-embed__meta">

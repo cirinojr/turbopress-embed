@@ -1,42 +1,50 @@
 {
-  "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 2,
-  "name": "tpe/tiktok",
-  "version": "1.0.0",
-  "title": "TurboPress TikTok",
-  "category": "embed",
-  "icon": "format-video",
-  "description": "TikTok preview card with click-to-load embed.",
-  "keywords": ["tiktok", "embed", "performance"],
-  "textdomain": "turbopress-embed",
-  "editorScript": "turbopress-embed-editor",
-  "editorStyle": "turbopress-embed-editor-style",
-  "style": "turbopress-embed-tiktok-style",
-  "viewScript": "turbopress-embed-tiktok-view",
-  "attributes": {
-    "url": {
-      "type": "string",
-      "default": ""
-    },
-    "title": {
-      "type": "string",
-      "default": ""
-    },
-    "authorName": {
-      "type": "string",
-      "default": ""
-    },
-    "thumbnailUrl": {
-      "type": "string",
-      "default": ""
-    },
-    "embedHtml": {
-      "type": "string",
-      "default": ""
-    }
-  },
-  "supports": {
-    "html": false,
-    "align": ["wide", "full"]
-  }
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "tpe/tiktok",
+	"version": "1.0.0",
+	"title": "TurboPress TikTok",
+	"category": "embed",
+	"icon": "format-video",
+	"description": "TikTok preview card with click-to-load embed.",
+	"keywords": [ "tiktok", "embed", "performance" ],
+	"textdomain": "turbopress-embed",
+	"editorScript": "turbopress-embed-editor",
+	"editorStyle": "turbopress-embed-editor-style",
+	"style": "turbopress-embed-tiktok-style",
+	"viewScript": "turbopress-embed-tiktok-view",
+	"attributes": {
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"authorName": {
+			"type": "string",
+			"default": ""
+		},
+		"videoId": { "type": "string", "default": "" },
+		"caption": { "type": "string", "default": "" },
+		"authorUsername": { "type": "string", "default": "" },
+		"authorDisplayName": { "type": "string", "default": "" },
+		"authorAvatar": { "type": "string", "default": "" },
+		"authorVerified": { "type": "boolean", "default": false },
+		"hashtags": { "type": "array", "default": [] },
+		"music": { "type": "object", "default": {} },
+		"thumbnailUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"embedHtml": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	}
 }

@@ -20,7 +20,7 @@ const mountSpotifyPlayer = ( root ) => {
       frame.loading = 'lazy';
       frame.allow =
         'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-      frame.setAttribute( 'allowfullscreen', '' );
+      frame.allowFullscreen = true;
 
       const frameWrapper = document.createElement( 'div' );
       frameWrapper.className = 'turbopress-embed__frame';
@@ -28,6 +28,7 @@ const mountSpotifyPlayer = ( root ) => {
 
       root.replaceChildren( frameWrapper );
       root.classList.add( 'is-loaded' );
+      frame.focus( { preventScroll: true } );
     },
     { once: true },
   );

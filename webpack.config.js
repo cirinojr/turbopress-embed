@@ -19,5 +19,8 @@ module.exports = {
     editor_css: './assets/styles/editor.css',
     portfolio: './blocks/portfolio.js',
     portfolio_view: './assets/scripts/portfolio-code.js',
+    nextgen: './blocks/nextgen.js',
+    nextgen_view: './assets/scripts/nextgen.js',
+    nextgen_css: './assets/styles/nextgen.css',
   },
 };

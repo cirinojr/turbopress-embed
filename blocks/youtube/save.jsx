@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 const buildYoutubeThumb = ( videoId ) =>
   videoId ? `https://i.ytimg.com/vi/${ videoId }/hqdefault.jpg` : '';
@@ -75,7 +75,7 @@ const Save = ( { attributes } ) => {
             ) ) }
           <div className="turbopress-embed__heading">
             <span className="turbopress-embed__title" title={ title }>
-              { title || 'YouTube video' }
+              { title || __( 'YouTube video', 'turbopress-embed' ) }
             </span>
             { channelName && (
               <span className="turbopress-embed__channel-line">
@@ -96,7 +96,7 @@ const Save = ( { attributes } ) => {
                 { channelVerified && (
                   <span
                     className="turbopress-embed__verified"
-                    aria-label="Verified channel"
+                    aria-label={ __( 'Verified channel', 'turbopress-embed' ) }
                   >
                     ✓
                   </span>
@@ -115,10 +115,19 @@ const Save = ( { attributes } ) => {
           className="turbopress-embed__trigger"
           aria-label={
             playableInEmbed
-              ? `Play video: ${ title || 'YouTube video' }`
-              : `Video unavailable for embedded playback: ${
-                  title || 'YouTube video'
-                }`
+              ? sprintf(
+                  // translators: %s is the YouTube video title.
+                  __( 'Play video: %s', 'turbopress-embed' ),
+                  title || __( 'YouTube video', 'turbopress-embed' ),
+                )
+              : sprintf(
+                  // translators: %s is the YouTube video title.
+                  __(
+                    'Video unavailable for embedded playback: %s',
+                    'turbopress-embed',
+                  ),
+                  title || __( 'YouTube video', 'turbopress-embed' ),
+                )
           }
           disabled={ ! playableInEmbed }
         >

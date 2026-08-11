@@ -1,4 +1,5 @@
 import '../assets/styles/portfolio.css';
+import { __, sprintf } from '@wordpress/i18n';
 import githubProject from './github-project/block.json';
 import githubCode from './github-code/block.json';
 import techStack from './tech-stack/block.json';
@@ -18,6 +19,31 @@ const {
 } = wp.components;
 const { Fragment, useEffect, useState } = wp.element;
 
+const fileName = ( path = '' ) => path.split( '/' ).pop() || path;
+const fileLanguage = ( path = '' ) => {
+  const extension = fileName( path ).split( '.' ).pop().toLowerCase();
+  return (
+    {
+      css: 'CSS',
+      html: 'HTML',
+      js: 'JavaScript',
+      jsx: 'JavaScript',
+      json: 'JSON',
+      md: 'Markdown',
+      php: 'PHP',
+      py: 'Python',
+      rb: 'Ruby',
+      scss: 'SCSS',
+      ts: 'TypeScript',
+      tsx: 'TypeScript',
+      yml: 'YAML',
+      yaml: 'YAML',
+    }[ extension ] ||
+    extension.toUpperCase() ||
+    'Code'
+  );
+};
+
 const safePublicUrl = ( value ) => {
   try {
     const url = new URL( value );
@@ -25,6 +51,12 @@ const safePublicUrl = ( value ) => {
   } catch {
     return '';
   }
+};
+
+const caseSectionLabels = {
+  challenge: __( 'Challenge', 'turbopress-embed' ),
+  solution: __( 'Solution', 'turbopress-embed' ),
+  result: __( 'Result', 'turbopress-embed' ),
 };
 
 const openDatabase = () =>
@@ -284,24 +316,41 @@ const GithubProjectEdit = ( { attributes: a, setAttributes: set } ) => {
       <RemoteState state={ state } />
       { d && (
         <Fragment>
-          <h3>{ a.customTitle || d.name }</h3>
-          <p>{ a.customDescription || d.description }</p>
-          <ul className="tpe-meta">
-            { a.showLanguage && d.language && <li>{ d.language }</li> }
-            { a.showStars && <li>{ d.stars } stars</li> }
-            { a.showForks && <li>{ d.forks } forks</li> }
-            { a.showLicense && d.license && <li>{ d.license }</li> }
-          </ul>
-          { a.showTopics && (
-            <p className="tpe-topics">
-              { d.topics.map( ( x ) => (
-                <span key={ x }>{ x }</span>
-              ) ) }
-            </p>
-          ) }
-          <Button variant="secondary" onClick={ state.refresh }>
-            Refresh now
-          </Button>
+          <div className="tpe-project-eyebrow">
+            <span className="tpe-repo-icon" aria-hidden="true" />
+            { __( 'GitHub Project', 'turbopress-embed' ) }
+          </div>
+          <div className="tpe-project-content">
+            <p className="tpe-project-title">{ a.customTitle || d.name }</p>
+            { ( a.customDescription || d.description ) && (
+              <p>{ a.customDescription || d.description }</p>
+            ) }
+          </div>
+          <div className="tpe-project-footer">
+            <div>
+              <ul className="tpe-meta">
+                { a.showLanguage && d.language && (
+                  <li className="tpe-language">{ d.language }</li>
+                ) }
+                { a.showStars && <li>★ { d.stars } stars</li> }
+                { a.showForks && <li>⑂ { d.forks } forks</li> }
+                { a.showLicense && d.license && <li>{ d.license }</li> }
+                { a.showUpdatedDate && d.updated_at && (
+                  <li>{ new Date( d.updated_at ).toLocaleDateString() }</li>
+                ) }
+              </ul>
+              { a.showTopics && d.topics.length > 0 && (
+                <p className="tpe-topics">
+                  { d.topics.map( ( x ) => (
+                    <span key={ x }>{ x }</span>
+                  ) ) }
+                </p>
+              ) }
+            </div>
+            <Button variant="secondary" onClick={ state.refresh }>
+              { __( 'Refresh now', 'turbopress-embed' ) }
+            </Button>
+          </div>
         </Fragment>
       ) }
     </div>
@@ -309,6 +358,7 @@ const GithubProjectEdit = ( { attributes: a, setAttributes: set } ) => {
 };
 
 const GithubCodeEdit = ( { attributes: a, setAttributes: set } ) => {
+  const [ copied, setCopied ] = useState( false );
   const ready = Boolean( a.repositoryUrl && a.filePath );
   const state = useRemote(
     'file',
@@ -330,7 +380,9 @@ const GithubCodeEdit = ( { attributes: a, setAttributes: set } ) => {
   );
   return (
     <div
-      { ...useBlockProps( { className: designClass( a, 'tpe-github-code' ) } ) }
+      { ...useBlockProps( {
+        className: designClass( a, 'tpe-github-code' ),
+      } ) }
     >
       <InspectorControls>
         <PanelBody title="Code settings">
@@ -408,15 +460,37 @@ const GithubCodeEdit = ( { attributes: a, setAttributes: set } ) => {
       { state.data && (
         <Fragment>
           <div className="tpe-code-header">
-            { a.showFilename && <strong>{ state.data.path }</strong> }
+            <div className="tpe-code-heading">
+              <span className="tpe-code-eyebrow">
+                <span className="tpe-file-icon" aria-hidden="true" />
+                { fileLanguage( state.data.path ) }{ ' ' }
+                { __( 'file', 'turbopress-embed' ) }
+              </span>
+              <p className="tpe-code-title">
+                { a.title || fileName( state.data.path ) }
+              </p>
+              { a.showFilename && a.title && (
+                <strong>{ state.data.path }</strong>
+              ) }
+              { a.description && <p>{ a.description }</p> }
+            </div>
             <Button
               className="tpe-code-copy"
-              aria-live="polite"
-              onClick={ () =>
-                window.navigator.clipboard?.writeText( lines.join( '\n' ) )
-              }
+              onClick={ async () => {
+                if ( ! window.navigator.clipboard ) return;
+                await window.navigator.clipboard.writeText(
+                  lines.join( '\n' ),
+                );
+                setCopied( true );
+                window.setTimeout( () => setCopied( false ), 1600 );
+              } }
             >
-              Copy code
+              <span className="tpe-copy-icon" aria-hidden="true" />
+              <span aria-live="polite">
+                { copied
+                  ? __( 'Copied', 'turbopress-embed' )
+                  : __( 'Copy code', 'turbopress-embed' ) }
+              </span>
             </Button>
           </div>
           <pre style={ { maxHeight: a.maxHeight } }>
@@ -430,7 +504,9 @@ const GithubCodeEdit = ( { attributes: a, setAttributes: set } ) => {
                     }` }
                     key={ i }
                   >
-                    { a.showLineNumbers && <b>{ number }</b> }
+                    { a.showLineNumbers && (
+                      <b aria-hidden="true">{ number }</b>
+                    ) }
                     { line }
                     { '\n' }
                   </span>
@@ -438,9 +514,16 @@ const GithubCodeEdit = ( { attributes: a, setAttributes: set } ) => {
               } ) }
             </code>
           </pre>
-          <Button variant="secondary" onClick={ state.refresh }>
-            Refresh now
-          </Button>
+          <div className="tpe-code-footer">
+            <span>
+              { fileLanguage( state.data.path ) } · { lines.length }{ ' ' }
+              { __( 'lines', 'turbopress-embed' ) }
+              { state.data.branch ? ` · ${ state.data.branch }` : '' }
+            </span>
+            <Button variant="secondary" onClick={ state.refresh }>
+              { __( 'Refresh now', 'turbopress-embed' ) }
+            </Button>
+          </div>
         </Fragment>
       ) }
     </div>
@@ -482,6 +565,11 @@ const TechnologyEditor = ( { items, onChange } ) => (
         />
         <Button
           disabled={ ! index }
+          aria-label={ sprintf(
+            // translators: %s is a technology name.
+            __( 'Move %s up', 'turbopress-embed' ),
+            item.name || __( 'technology', 'turbopress-embed' ),
+          ) }
           onClick={ () => {
             const n = [ ...items ];
             [ n[ index - 1 ], n[ index ] ] = [ n[ index ], n[ index - 1 ] ];
@@ -492,6 +580,11 @@ const TechnologyEditor = ( { items, onChange } ) => (
         </Button>
         <Button
           disabled={ index === items.length - 1 }
+          aria-label={ sprintf(
+            // translators: %s is a technology name.
+            __( 'Move %s down', 'turbopress-embed' ),
+            item.name || __( 'technology', 'turbopress-embed' ),
+          ) }
           onClick={ () => {
             const n = [ ...items ];
             [ n[ index + 1 ], n[ index ] ] = [ n[ index ], n[ index + 1 ] ];
@@ -502,6 +595,11 @@ const TechnologyEditor = ( { items, onChange } ) => (
         </Button>
         <Button
           isDestructive
+          aria-label={ sprintf(
+            // translators: %s is a technology name.
+            __( 'Remove %s', 'turbopress-embed' ),
+            item.name || __( 'technology', 'turbopress-embed' ),
+          ) }
           onClick={ () => onChange( items.filter( ( x, i ) => i !== index ) ) }
         >
           Remove
@@ -612,78 +710,94 @@ const TechStackEdit = ( { attributes: a, setAttributes: set } ) => {
   );
 };
 
-const CaseStudyView = ( { a, editing = false, set } ) => (
-  <article className={ designClass( a, 'tpe-case-study' ) }>
-    { safePublicUrl( a.featuredImageUrl ) && (
-      <img src={ safePublicUrl( a.featuredImageUrl ) } alt="" />
-    ) }
-    { editing ? (
-      <Fragment>
-        <RichText
-          tagName="h2"
-          placeholder="Project title"
-          value={ a.projectTitle }
-          onChange={ ( v ) => set( { projectTitle: v } ) }
+const CaseStudyView = ( { a, editing = false, set } ) => {
+  const headingLevel = Math.min( 6, Math.max( 2, a.headingLevel || 2 ) );
+  const sectionLevel = Math.min( 6, headingLevel + 1 );
+  const HeadingTag = `h${ headingLevel }`;
+  const SectionHeadingTag = `h${ sectionLevel }`;
+
+  return (
+    <article className={ designClass( a, 'tpe-case-study' ) }>
+      { safePublicUrl( a.featuredImageUrl ) && (
+        <img
+          src={ safePublicUrl( a.featuredImageUrl ) }
+          alt={ a.featuredImageAlt || '' }
         />
-        <RichText
-          tagName="p"
-          placeholder="Short summary"
-          value={ a.summary }
-          onChange={ ( v ) => set( { summary: v } ) }
+      ) }
+      { editing ? (
+        <Fragment>
+          <RichText
+            tagName={ HeadingTag }
+            placeholder={ __( 'Project title', 'turbopress-embed' ) }
+            value={ a.projectTitle }
+            onChange={ ( v ) => set( { projectTitle: v } ) }
+          />
+          <RichText
+            tagName="p"
+            placeholder={ __( 'Short summary', 'turbopress-embed' ) }
+            value={ a.summary }
+            onChange={ ( v ) => set( { summary: v } ) }
+          />
+          { [ 'challenge', 'solution', 'result' ].map( ( x ) => (
+            <section key={ x }>
+              <SectionHeadingTag>{ caseSectionLabels[ x ] }</SectionHeadingTag>
+              <RichText
+                tagName="p"
+                placeholder={ sprintf(
+                  // translators: %s is a case-study section name.
+                  __( 'Describe the %s', 'turbopress-embed' ),
+                  x,
+                ) }
+                value={ a[ x ] }
+                onChange={ ( v ) => set( { [ x ]: v } ) }
+              />
+            </section>
+          ) ) }
+        </Fragment>
+      ) : (
+        <Fragment>
+          { a.projectTitle && (
+            <RichText.Content tagName={ HeadingTag } value={ a.projectTitle } />
+          ) }{ ' ' }
+          { a.summary && <RichText.Content tagName="p" value={ a.summary } /> }{ ' ' }
+          { [ 'challenge', 'solution', 'result' ].map(
+            ( x ) =>
+              a[ x ] && (
+                <section key={ x }>
+                  <SectionHeadingTag>
+                    { caseSectionLabels[ x ] }
+                  </SectionHeadingTag>
+                  <RichText.Content tagName="p" value={ a[ x ] } />
+                </section>
+              ),
+          ) }
+        </Fragment>
+      ) }
+      { a.role && (
+        <p>
+          <strong>Role:</strong> { a.role }
+        </p>
+      ) }
+      { a.company && (
+        <p>
+          <strong>Company/client:</strong> { a.company }
+        </p>
+      ) }
+      { a.date && <time>{ a.date }</time> }
+      { a.technologies?.length > 0 && (
+        <TechStackView
+          a={ {
+            layout: 'badges',
+            showPercentages: false,
+            theme: a.theme,
+            density: a.density,
+          } }
+          items={ a.technologies }
         />
-        { [ 'challenge', 'solution', 'result' ].map( ( x ) => (
-          <section key={ x }>
-            <h3>{ x[ 0 ].toUpperCase() + x.slice( 1 ) }</h3>
-            <RichText
-              tagName="p"
-              placeholder={ `Describe the ${ x }` }
-              value={ a[ x ] }
-              onChange={ ( v ) => set( { [ x ]: v } ) }
-            />
-          </section>
-        ) ) }
-      </Fragment>
-    ) : (
-      <Fragment>
-        { a.projectTitle && (
-          <RichText.Content tagName="h2" value={ a.projectTitle } />
-        ) }{ ' ' }
-        { a.summary && <RichText.Content tagName="p" value={ a.summary } /> }{ ' ' }
-        { [ 'challenge', 'solution', 'result' ].map(
-          ( x ) =>
-            a[ x ] && (
-              <section key={ x }>
-                <h3>{ x[ 0 ].toUpperCase() + x.slice( 1 ) }</h3>
-                <RichText.Content tagName="p" value={ a[ x ] } />
-              </section>
-            ),
-        ) }
-      </Fragment>
-    ) }
-    { a.role && (
-      <p>
-        <strong>Role:</strong> { a.role }
-      </p>
-    ) }
-    { a.company && (
-      <p>
-        <strong>Company/client:</strong> { a.company }
-      </p>
-    ) }
-    { a.date && <time>{ a.date }</time> }
-    { a.technologies?.length > 0 && (
-      <TechStackView
-        a={ {
-          layout: 'badges',
-          showPercentages: false,
-          theme: a.theme,
-          density: a.density,
-        } }
-        items={ a.technologies }
-      />
-    ) }
-  </article>
-);
+      ) }
+    </article>
+  );
+};
 const CaseStudyEdit = ( { attributes: a, setAttributes: set } ) => (
   <div { ...useBlockProps() }>
     <InspectorControls>
@@ -704,6 +818,26 @@ const CaseStudyEdit = ( { attributes: a, setAttributes: set } ) => (
             onChange={ ( v ) => set( { [ x ]: v } ) }
           />
         ) ) }
+        <Field
+          label={ __( 'Featured image alternative text', 'turbopress-embed' ) }
+          value={ a.featuredImageAlt }
+          onChange={ ( v ) => set( { featuredImageAlt: v } ) }
+        />
+        <p className="components-base-control__help">
+          { __(
+            'Describe meaningful image content. Leave empty when the image is decorative or repeats the surrounding text.',
+            'turbopress-embed',
+          ) }
+        </p>
+        <SelectControl
+          label={ __( 'Title heading level', 'turbopress-embed' ) }
+          value={ a.headingLevel || 2 }
+          options={ [ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+            label: `H${ level }`,
+            value: level,
+          } ) ) }
+          onChange={ ( level ) => set( { headingLevel: Number( level ) } ) }
+        />
         <SelectControl
           label="Layout"
           value={ a.layout }
@@ -740,11 +874,14 @@ const MetricsView = ( { a } ) => (
   <div className={ designClass( a, 'tpe-project-metrics' ) }>
     { a.metrics.map( ( m, i ) => (
       <article key={ i }>
-        <h3>{ m.label }</h3>
+        <p className="tpe-metric-label">{ m.label }</p>
         <p>
           { ! a.hideBefore && m.before && (
             <Fragment>
               <span>
+                <span className="screen-reader-text">
+                  { __( 'Before:', 'turbopress-embed' ) }{ ' ' }
+                </span>
                 { m.before }
                 { m.unit }
               </span>
@@ -752,6 +889,9 @@ const MetricsView = ( { a } ) => (
             </Fragment>
           ) }
           <strong>
+            <span className="screen-reader-text">
+              { __( 'After:', 'turbopress-embed' ) }{ ' ' }
+            </span>
             { m.after }
             { m.unit }
           </strong>
@@ -825,6 +965,11 @@ const MetricsEdit = ( { attributes: a, setAttributes: set } ) => {
           />
           <Button
             disabled={ ! i }
+            aria-label={ sprintf(
+              // translators: %s is a metric label.
+              __( 'Move %s up', 'turbopress-embed' ),
+              m.label || __( 'metric', 'turbopress-embed' ),
+            ) }
             onClick={ () => {
               const n = [ ...a.metrics ];
               [ n[ i - 1 ], n[ i ] ] = [ n[ i ], n[ i - 1 ] ];
@@ -834,9 +979,31 @@ const MetricsEdit = ( { attributes: a, setAttributes: set } ) => {
             Up
           </Button>
           <Button
+            disabled={ i === a.metrics.length - 1 }
+            aria-label={ sprintf(
+              // translators: %s is a metric label.
+              __( 'Move %s down', 'turbopress-embed' ),
+              m.label || __( 'metric', 'turbopress-embed' ),
+            ) }
+            onClick={ () => {
+              const n = [ ...a.metrics ];
+              [ n[ i + 1 ], n[ i ] ] = [ n[ i ], n[ i + 1 ] ];
+              set( { metrics: n } );
+            } }
+          >
+            Down
+          </Button>
+          <Button
             isDestructive
+            aria-label={ sprintf(
+              // translators: %s is a metric label.
+              __( 'Remove %s', 'turbopress-embed' ),
+              m.label || __( 'metric', 'turbopress-embed' ),
+            ) }
             onClick={ () =>
-              set( { metrics: a.metrics.filter( ( x, j ) => j !== i ) } )
+              set( {
+                metrics: a.metrics.filter( ( x, j ) => j !== i ),
+              } )
             }
           >
             Remove

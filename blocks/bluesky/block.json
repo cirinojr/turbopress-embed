@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "tpe/bluesky",
+  "version": "1.0.0",
+  "title": "Bluesky Post",
+  "category": "embed",
+  "icon": "format-status",
+  "description": "Lightweight preview of a public Bluesky post.",
+  "keywords": ["TurboPress", "embed", "Bluesky Post"],
+  "textdomain": "turbopress-embed",
+  "editorScript": "turbopress-nextgen-editor",
+  "style": "turbopress-nextgen-style",
+  "viewScript": "turbopress-nextgen-view",
+  "attributes": {
+    "url": { "type": "string", "default": "" },
+    "resourceType": { "type": "string", "default": "" },
+    "resourceId": { "type": "string", "default": "" },
+    "title": { "type": "string", "default": "" },
+    "author": { "type": "string", "default": "" },
+    "description": { "type": "string", "default": "" },
+    "thumbnail": { "type": "string", "default": "" },
+    "embedUrl": { "type": "string", "default": "" },
+    "text": { "type": "string", "default": "" },
+    "avatar": { "type": "string", "default": "" },
+    "createdAt": { "type": "string", "default": "" },
+    "siteName": { "type": "string", "default": "" },
+    "favicon": { "type": "string", "default": "" },
+    "files": { "type": "array", "default": [] }
+  },
+  "supports": { "html": false, "align": ["wide", "full"] }
+}

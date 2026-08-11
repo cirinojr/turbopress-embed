@@ -218,7 +218,7 @@
 .turbopress-embed--youtube .turbopress-embed__watch:focus-visible,
 .turbopress-embed--youtube .turbopress-embed__channel-avatar-link:focus-visible,
 .turbopress-embed--youtube .turbopress-embed__channel-name:focus-visible {
-	outline: 2px solid var(--tpe-focus);
+	outline: 3px solid var(--tpe-focus);
 	outline-offset: 2px;
 }
 

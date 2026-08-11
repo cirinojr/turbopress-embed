@@ -1,4 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
 
 const Save = ( { attributes } ) => {
   const { url, title, thumbnailUrl, backgroundColor, embedUrl } = attributes;
@@ -20,16 +21,23 @@ const Save = ( { attributes } ) => {
         <button
           type="button"
           className="turbopress-embed__trigger"
-          aria-label={ title || 'Spotify content' }
+          aria-label={ sprintf(
+            // translators: %s is the Spotify content title.
+            __( 'Play on Spotify: %s', 'turbopress-embed' ),
+            title || __( 'Spotify content', 'turbopress-embed' ),
+          ) }
         >
           <span className="turbopress-embed__thumb" aria-hidden="true" />
           <span className="turbopress-embed__meta">
             <span className="turbopress-embed__provider">Spotify</span>
             <span className="turbopress-embed__title">
-              { title || 'Spotify content' }
+              { title || __( 'Spotify content', 'turbopress-embed' ) }
             </span>
             <span className="turbopress-embed__hint">
-              Click to load embedded player
+              { __(
+                'Activate to load the embedded player',
+                'turbopress-embed',
+              ) }
             </span>
           </span>
           <span className="turbopress-embed__play" aria-hidden="true">

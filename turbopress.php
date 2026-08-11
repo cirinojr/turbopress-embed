@@ -23,34 +23,46 @@
 defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/includes/class-turbopress-remote-data.php';
+require_once __DIR__ . '/includes/class-turbopress-nextgen-providers.php';
 
 final class TurboPress
 {
     private const VERSION = '1.0.0';
-    private const CACHE_VERSION = '2';
+    private const CACHE_VERSION = '3';
     private const CACHE_TTL = 21600;
     private const REMOTE_TIMEOUT = 8;
-
-    protected static $instance = null;
-
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
+    private const LEGACY_PROVIDERS = array('youtube', 'spotify', 'tiktok', 'twitter', 'soundcloud');
+    private const PROVIDER_CONFIGS = array(
+        'spotify'    => array(
+            'endpoint'   => 'https://open.spotify.com/oembed',
+            'query_args' => array(),
+            'hosts'      => array('open.spotify.com'),
+        ),
+        'tiktok'     => array(
+            'endpoint'   => 'https://www.tiktok.com/oembed',
+            'query_args' => array(),
+            'hosts'      => array('tiktok.com', 'vm.tiktok.com'),
+        ),
+        'twitter'    => array(
+            'endpoint'   => 'https://publish.twitter.com/oembed',
+            'query_args' => array('omit_script' => '1', 'dnt' => 'true'),
+            'hosts'      => array('x.com', 'twitter.com'),
+        ),
+        'soundcloud' => array(
+            'endpoint'   => 'https://soundcloud.com/oembed',
+            'query_args' => array('format' => 'json'),
+            'hosts'      => array('soundcloud.com', 'on.soundcloud.com'),
+        ),
+    );
 
     public function __construct()
     {
         add_action('init', array($this, 'registerAssetsAndBlocks'));
-        add_action('wp_ajax_tpe_get_spotify', array($this, 'getSpotify'));
-        add_action('wp_ajax_tpe_get_youtube', array($this, 'getYoutube'));
-        add_action('wp_ajax_tpe_get_tiktok', array($this, 'getTikTok'));
-        add_action('wp_ajax_tpe_get_twitter', array($this, 'getTwitter'));
-        add_action('wp_ajax_tpe_get_soundcloud', array($this, 'getSoundCloud'));
+        foreach (self::LEGACY_PROVIDERS as $provider) {
+            add_action('wp_ajax_tpe_get_' . $provider, array($this, 'handleProviderRequest'));
+        }
         TurboPress_Remote_Data::init();
+        TurboPress_Nextgen_Providers::init();
     }
 
     public function registerAssetsAndBlocks()
@@ -72,46 +84,6 @@ final class TurboPress
             )
         );
 
-        wp_register_script(
-            'turbopress-embed-youtube-view',
-            plugins_url('build/yt_js.js', __FILE__),
-            array(),
-            self::VERSION,
-            true
-        );
-
-        wp_register_script(
-            'turbopress-embed-spotify-view',
-            plugins_url('build/sf_js.js', __FILE__),
-            array(),
-            self::VERSION,
-            true
-        );
-
-        wp_register_script(
-            'turbopress-embed-tiktok-view',
-            plugins_url('build/tt_js.js', __FILE__),
-            array(),
-            self::VERSION,
-            true
-        );
-
-        wp_register_script(
-            'turbopress-embed-twitter-view',
-            plugins_url('build/tw_js.js', __FILE__),
-            array(),
-            self::VERSION,
-            true
-        );
-
-        wp_register_script(
-            'turbopress-embed-soundcloud-view',
-            plugins_url('build/sc_js.js', __FILE__),
-            array(),
-            self::VERSION,
-            true
-        );
-
         wp_register_style(
             'turbopress-embed-editor-style',
             plugins_url('build/editor_css.css', __FILE__),
@@ -119,40 +91,29 @@ final class TurboPress
             self::VERSION
         );
 
-        wp_register_style(
-            'turbopress-embed-youtube-style',
-            plugins_url('build/yt_css.css', __FILE__),
-            array(),
-            self::VERSION
+        $provider_assets = array(
+            'youtube'   => array('script' => 'yt_js', 'style' => 'yt_css'),
+            'spotify'   => array('script' => 'sf_js', 'style' => 'sf_css'),
+            'tiktok'    => array('script' => 'tt_js', 'style' => 'tt_css'),
+            'twitter'   => array('script' => 'tw_js', 'style' => 'tw_css'),
+            'soundcloud' => array('script' => 'sc_js', 'style' => 'sc_css'),
         );
 
-        wp_register_style(
-            'turbopress-embed-spotify-style',
-            plugins_url('build/sf_css.css', __FILE__),
-            array(),
-            self::VERSION
-        );
-
-        wp_register_style(
-            'turbopress-embed-tiktok-style',
-            plugins_url('build/tt_css.css', __FILE__),
-            array(),
-            self::VERSION
-        );
-
-        wp_register_style(
-            'turbopress-embed-twitter-style',
-            plugins_url('build/tw_css.css', __FILE__),
-            array(),
-            self::VERSION
-        );
-
-        wp_register_style(
-            'turbopress-embed-soundcloud-style',
-            plugins_url('build/sc_css.css', __FILE__),
-            array(),
-            self::VERSION
-        );
+        foreach ($provider_assets as $provider => $assets) {
+            wp_register_script(
+                'turbopress-embed-' . $provider . '-view',
+                plugins_url('build/' . $assets['script'] . '.js', __FILE__),
+                array(),
+                self::VERSION,
+                true
+            );
+            wp_register_style(
+                'turbopress-embed-' . $provider . '-style',
+                plugins_url('build/' . $assets['style'] . '.css', __FILE__),
+                array(),
+                self::VERSION
+            );
+        }
 
         $portfolio_asset_file = __DIR__ . '/build/portfolio.asset.php';
         $portfolio_asset = file_exists($portfolio_asset_file)
@@ -198,11 +159,15 @@ final class TurboPress
             true
         );
 
-        register_block_type(__DIR__ . '/blocks/youtube');
-        register_block_type(__DIR__ . '/blocks/spotify');
-        register_block_type(__DIR__ . '/blocks/tiktok');
-        register_block_type(__DIR__ . '/blocks/twitter');
-        register_block_type(__DIR__ . '/blocks/soundcloud');
+        $nextgen_asset = file_exists(__DIR__ . '/build/nextgen.asset.php') ? require __DIR__ . '/build/nextgen.asset.php' : array('dependencies' => array('wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element', 'wp-i18n'), 'version' => self::VERSION);
+        wp_register_script('turbopress-nextgen-editor', plugins_url('build/nextgen.js', __FILE__), $nextgen_asset['dependencies'], $nextgen_asset['version'], true);
+        wp_localize_script('turbopress-nextgen-editor', 'turbopressEmbedConfig', array('ajaxUrl' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('turbopress_embed_editor_nonce')));
+        wp_register_script('turbopress-nextgen-view', plugins_url('build/nextgen_view.js', __FILE__), array(), self::VERSION, true);
+        wp_register_style('turbopress-nextgen-style', plugins_url('build/nextgen_css.css', __FILE__), array(), self::VERSION);
+
+        foreach (array_keys($provider_assets) as $provider_block) {
+            register_block_type(__DIR__ . '/blocks/' . $provider_block);
+        }
 
         $portfolio_blocks = array(
             'github-project',
@@ -218,36 +183,16 @@ final class TurboPress
                 array('render_callback' => array('TurboPress_Remote_Data', 'render_dynamic_block'))
             );
         }
+
+        foreach (array('vimeo', 'github-gist', 'bluesky', 'twitch', 'smart-url', 'codepen', 'loom', 'figma') as $nextgen_block) {
+            register_block_type(__DIR__ . '/blocks/' . $nextgen_block);
+        }
     }
 
-    public function getYoutube()
-    {
-        $this->handleProviderRequest('youtube');
-    }
-
-    public function getSpotify()
-    {
-        $this->handleProviderRequest('spotify');
-    }
-
-    public function getTikTok()
-    {
-        $this->handleProviderRequest('tiktok');
-    }
-
-    public function getTwitter()
-    {
-        $this->handleProviderRequest('twitter');
-    }
-
-    public function getSoundCloud()
-    {
-        $this->handleProviderRequest('soundcloud');
-    }
-
-    private function handleProviderRequest($provider)
+    public function handleProviderRequest()
     {
         $this->validateEditorRequest();
+        $provider = str_replace('wp_ajax_tpe_get_', '', current_action());
 
         $raw_url = isset($_POST['url']) ? wp_unslash($_POST['url']) : '';
         $url     = esc_url_raw($raw_url);
@@ -285,7 +230,7 @@ final class TurboPress
             return $metadata;
         }
 
-        $config = $this->getProviderConfig($provider);
+        $config = self::PROVIDER_CONFIGS[$provider] ?? array();
 
         if (empty($config)) {
             return $this->errorResult('invalid_provider', __('Unsupported provider.', 'turbopress-embed'));
@@ -300,11 +245,24 @@ final class TurboPress
             $url = $this->getSpotifyPublicUrl($spotify_resource);
         }
 
+        if ('tiktok' === $provider) {
+            $tiktok_resource = $this->parseTikTokVideoUrl($url);
+            if (is_array($tiktok_resource)) {
+                $url = $this->getTikTokVideoUrl($tiktok_resource);
+            }
+        }
+
         if (!$this->isSupportedHost($url, $config['hosts'])) {
             return $this->errorResult('invalid_host', __('Unsupported URL host for this provider.', 'turbopress-embed'));
         }
 
-        $cache_key = 'tpe_embed_' . self::CACHE_VERSION . '_' . md5($provider . '|' . $url);
+        $cache_identity = $url;
+        if ('tiktok' === $provider) {
+            $cache_identity = isset($tiktok_resource['id'])
+                ? 'preview:2|video:' . $tiktok_resource['id']
+                : 'preview:2|url:' . $url;
+        }
+        $cache_key = 'tpe_embed_' . self::CACHE_VERSION . '_' . md5($provider . '|' . $cache_identity);
         $cached    = get_transient($cache_key);
 
         if (is_array($cached)) {
@@ -442,14 +400,165 @@ final class TurboPress
             return $this->errorResult('remote_error', __('TikTok did not return embeddable content.', 'turbopress-embed'));
         }
 
+        $structured = $this->parseTikTokEmbedHtml($html);
+        $resource   = $this->parseTikTokVideoUrl($url);
+        if (!is_array($resource) && !empty($structured['videoId']) && !empty($structured['username'])) {
+            $resource = array('id' => $structured['videoId'], 'username' => $structured['username']);
+        }
+
+        $username = is_array($resource) ? $resource['username'] : $structured['username'];
+        $video_id = is_array($resource) ? $resource['id'] : $structured['videoId'];
+        $caption  = $structured['caption'];
+        if ('' === $caption && isset($data['title'])) {
+            $caption = sanitize_text_field($data['title']);
+        }
+
+        $avatar = isset($data['author_avatar_url']) ? esc_url_raw($data['author_avatar_url']) : '';
+        if (!$this->isTrustedTikTokImageUrl($avatar)) {
+            $avatar = '';
+        }
+
+        $thumbnail = isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '';
+        if (!$this->isTrustedTikTokImageUrl($thumbnail)) {
+            $thumbnail = '';
+        }
+
+        $canonical_url = $url;
+        if ($username && $video_id) {
+            $canonical_url = $this->getTikTokVideoUrl(array('username' => $username, 'id' => $video_id));
+        }
+
         return array(
             'provider'   => 'tiktok',
-            'url'        => $url,
-            'title'      => isset($data['title']) ? sanitize_text_field($data['title']) : '',
-            'thumbnail'  => isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
+            'url'        => esc_url_raw($canonical_url),
+            'videoId'    => $video_id,
+            'title'      => $caption,
+            'caption'    => $caption,
+            'thumbnail'  => $thumbnail,
             'authorName' => isset($data['author_name']) ? sanitize_text_field($data['author_name']) : '',
+            'author'     => array(
+                'username'    => $username,
+                'displayName' => isset($data['author_name']) ? sanitize_text_field($data['author_name']) : '',
+                'url'         => $username ? 'https://www.tiktok.com/@' . rawurlencode($username) : '',
+                'avatar'      => $avatar,
+                'verified'    => !empty($data['author_verified']),
+            ),
+            'hashtags'   => $structured['hashtags'],
+            'music'      => $structured['music'],
             'embedHtml'  => $html,
         );
+    }
+
+    private function parseTikTokVideoUrl($url)
+    {
+        $parts = wp_parse_url(trim((string) $url));
+        if (
+            !is_array($parts) ||
+            empty($parts['scheme']) ||
+            'https' !== strtolower($parts['scheme']) ||
+            empty($parts['host']) ||
+            !in_array(strtolower($parts['host']), array('tiktok.com', 'www.tiktok.com'), true)
+        ) {
+            return null;
+        }
+
+        if (!preg_match('#^/@([A-Za-z0-9._]{2,24})/video/([0-9]{10,30})/?$#', $parts['path'] ?? '', $matches)) {
+            return null;
+        }
+
+        return array('username' => $matches[1], 'id' => $matches[2]);
+    }
+
+    private function getTikTokVideoUrl($resource)
+    {
+        return 'https://www.tiktok.com/@' . rawurlencode($resource['username']) . '/video/' . $resource['id'];
+    }
+
+    private function parseTikTokEmbedHtml($html)
+    {
+        $result = array(
+            'videoId'  => '',
+            'username' => '',
+            'caption'  => '',
+            'hashtags' => array(),
+            'music'    => array(),
+        );
+        if ('' === $html || !class_exists('DOMDocument')) {
+            return $result;
+        }
+
+        $document = new DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $loaded   = $document->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        if (!$loaded) {
+            return $result;
+        }
+
+        $xpath      = new DOMXPath($document);
+        $blockquote = $xpath->query('//blockquote[contains(concat(" ", normalize-space(@class), " "), " tiktok-embed ")]')->item(0);
+        if (!$blockquote) {
+            return $result;
+        }
+
+        $video_id = $blockquote->getAttribute('data-video-id');
+        $result['videoId'] = preg_match('/^[0-9]{10,30}$/', $video_id) ? $video_id : '';
+        $caption_parts = array();
+
+        foreach ($xpath->query('.//section//a[@href]', $blockquote) as $anchor) {
+            $href = html_entity_decode($anchor->getAttribute('href'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $text = trim($anchor->textContent);
+            $path = (string) wp_parse_url($href, PHP_URL_PATH);
+
+            if (preg_match('#^/@([A-Za-z0-9._]{2,24})/?$#', $path, $matches)) {
+                $result['username'] = $matches[1];
+                continue;
+            }
+            if (preg_match('#^/tag/([A-Za-z0-9._-]{1,100})/?$#', $path, $matches)) {
+                $name = ltrim($text, '#');
+                $result['hashtags'][] = array(
+                    'name' => sanitize_text_field($name ?: $matches[1]),
+                    'url'  => 'https://www.tiktok.com/tag/' . rawurlencode(strtolower($matches[1])),
+                );
+                continue;
+            }
+            if (preg_match('#^/music/([A-Za-z0-9._~-]+)-([0-9]{10,30})/?$#', $path, $matches)) {
+                $result['music'] = array(
+                    'id'    => $matches[2],
+                    'slug'  => $matches[1],
+                    'title' => sanitize_text_field(preg_replace('/^\s*♬\s*/u', '', $text)),
+                    'url'   => 'https://www.tiktok.com/music/' . $matches[1] . '-' . $matches[2],
+                );
+            }
+        }
+
+        foreach ($xpath->query('.//section//text()[not(ancestor::a)]', $blockquote) as $text_node) {
+            $text = trim(preg_replace('/\s+/u', ' ', $text_node->nodeValue));
+            if ('' !== $text) {
+                $caption_parts[] = $text;
+            }
+        }
+        $result['caption'] = sanitize_text_field(implode(' ', $caption_parts));
+
+        return $result;
+    }
+
+    private function isTrustedTikTokImageUrl($url)
+    {
+        $parts = wp_parse_url($url);
+        if (!is_array($parts) || 'https' !== strtolower($parts['scheme'] ?? '') || empty($parts['host'])) {
+            return false;
+        }
+
+        $host = strtolower($parts['host']);
+        foreach (array('tiktokcdn.com', 'tiktokcdn-us.com', 'tiktokcdn-eu.com', 'muscdn.com', 'ibytedtos.com', 'byteimg.com', 'toscdn.com') as $suffix) {
+            if ($host === $suffix || str_ends_with($host, '.' . $suffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function normalizeTwitterPayload($url, $data)
@@ -540,37 +649,6 @@ final class TurboPress
         return wp_kses($cleaned, $allowed_tags);
     }
 
-    private function getProviderConfig($provider)
-    {
-        $providers = array(
-            'spotify'    => array(
-                'endpoint'   => 'https://open.spotify.com/oembed',
-                'query_args' => array(),
-                'hosts'      => array('open.spotify.com'),
-            ),
-            'tiktok'     => array(
-                'endpoint'   => 'https://www.tiktok.com/oembed',
-                'query_args' => array(),
-                'hosts'      => array('tiktok.com', 'vm.tiktok.com'),
-            ),
-            'twitter'    => array(
-                'endpoint'   => 'https://publish.twitter.com/oembed',
-                'query_args' => array(
-                    'omit_script' => '1',
-                    'dnt'         => 'true',
-                ),
-                'hosts'      => array('x.com', 'twitter.com'),
-            ),
-            'soundcloud' => array(
-                'endpoint'   => 'https://soundcloud.com/oembed',
-                'query_args' => array('format' => 'json'),
-                'hosts'      => array('soundcloud.com', 'on.soundcloud.com'),
-            ),
-        );
-
-        return isset($providers[$provider]) ? $providers[$provider] : array();
-    }
-
     private function isSupportedHost($url, $supported_hosts)
     {
         $host = wp_parse_url($url, PHP_URL_HOST);
@@ -606,4 +684,4 @@ final class TurboPress
     }
 }
 
-TurboPress::getInstance();
+new TurboPress();

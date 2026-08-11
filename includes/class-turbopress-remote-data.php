@@ -735,20 +735,29 @@ class TurboPress_Remote_Data {
 		$description = $a['customDescription'] ?? '';
 		$title = $title ? $title : $d['name'];
 		$description = $description ? $description : $d['description'];
-		$html = '<article ' . get_block_wrapper_attributes( array( 'class' => self::design_classes( $a, 'tpe-github-project', 'card' ) ) ) . '><h3>' . esc_html( $title ) . '</h3>';
+		$html = '<article ' . get_block_wrapper_attributes( array( 'class' => self::design_classes( $a, 'tpe-github-project', 'card' ) ) ) . '>';
+		$html .= '<div class="tpe-project-eyebrow"><span class="tpe-repo-icon" aria-hidden="true"></span>' . esc_html__( 'GitHub Project', 'turbopress-embed' ) . '</div>';
+		$html .= '<div class="tpe-project-content"><p class="tpe-project-title">' . esc_html( $title ) . '</p>';
 		if ( $description ) $html .= '<p>' . esc_html( $description ) . '</p>';
-		$html .= '<ul class="tpe-meta">';
-		if ( ! empty( $a['showLanguage'] ) && $d['language'] ) $html .= '<li>' . esc_html( $d['language'] ) . '</li>';
-		if ( ! empty( $a['showStars'] ) ) $html .= '<li>' . sprintf( esc_html__( '%s stars', 'turbopress-embed' ), number_format_i18n( $d['stars'] ) ) . '</li>';
-		if ( ! empty( $a['showForks'] ) ) $html .= '<li>' . sprintf( esc_html__( '%s forks', 'turbopress-embed' ), number_format_i18n( $d['forks'] ) ) . '</li>';
+		$html .= '</div><div class="tpe-project-footer"><div><ul class="tpe-meta">';
+		if ( ! empty( $a['showLanguage'] ) && $d['language'] ) $html .= '<li class="tpe-language">' . esc_html( $d['language'] ) . '</li>';
+		if ( ! empty( $a['showStars'] ) ) $html .= '<li><span aria-hidden="true">★</span> ' . sprintf( esc_html__( '%s stars', 'turbopress-embed' ), number_format_i18n( $d['stars'] ) ) . '</li>';
+		if ( ! empty( $a['showForks'] ) ) $html .= '<li><span aria-hidden="true">⑂</span> ' . sprintf( esc_html__( '%s forks', 'turbopress-embed' ), number_format_i18n( $d['forks'] ) ) . '</li>';
 		if ( ! empty( $a['showLicense'] ) && $d['license'] ) $html .= '<li>' . esc_html( $d['license'] ) . '</li>';
 		if ( ! empty( $a['showUpdatedDate'] ) && $d['updated_at'] ) $html .= '<li>' . esc_html( mysql2date( get_option( 'date_format' ), $d['updated_at'] ) ) . '</li>';
 		$html .= '</ul>';
 		if ( ! empty( $a['showTopics'] ) && $d['topics'] ) $html .= '<p class="tpe-topics">' . implode( ' ', array_map( function( $topic ) { return '<span>' . esc_html( $topic ) . '</span>'; }, $d['topics'] ) ) . '</p>';
-		if ( ! empty( $a['showRepositoryButton'] ) ) $html .= '<a class="tpe-button" href="' . esc_url( $d['url'] ) . '">' . esc_html__( 'View repository', 'turbopress-embed' ) . '</a>';
+		$html .= '</div><div class="tpe-project-actions">';
+		if ( ! empty( $a['showRepositoryButton'] ) ) $html .= '<a class="tpe-button is-primary" href="' . esc_url( $d['url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'View repository', 'turbopress-embed' ) . '<span aria-hidden="true">↗</span></a>';
 		$demo = ! empty( $a['demoUrl'] ) ? $a['demoUrl'] : $d['homepage'];
-		if ( ! empty( $a['showDemoButton'] ) && $demo ) $html .= '<a class="tpe-button" href="' . esc_url( $demo ) . '">' . esc_html__( 'View project', 'turbopress-embed' ) . '</a>';
-		return $html . '</article>';
+		if ( ! empty( $a['showDemoButton'] ) && $demo ) $html .= '<a class="tpe-button" href="' . esc_url( $demo ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'View project', 'turbopress-embed' ) . '<span aria-hidden="true">↗</span></a>';
+		return $html . '</div></div></article>';
+	}
+
+	private static function file_language( $path ) {
+		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+		$languages = array( 'css' => 'CSS', 'html' => 'HTML', 'js' => 'JavaScript', 'jsx' => 'JavaScript', 'json' => 'JSON', 'md' => 'Markdown', 'php' => 'PHP', 'py' => 'Python', 'rb' => 'Ruby', 'scss' => 'SCSS', 'ts' => 'TypeScript', 'tsx' => 'TypeScript', 'yml' => 'YAML', 'yaml' => 'YAML' );
+		return $languages[ $extension ] ?? ( $extension ? strtoupper( $extension ) : __( 'Code', 'turbopress-embed' ) );
 	}
 
 	private static function render_github_code( $a ) {
@@ -762,14 +771,15 @@ class TurboPress_Remote_Data {
 		$d = $result['payload']; $lines = preg_split( '/\R/', $d['content'] );
 		$start = max( 1, absint( $a['startLine'] ?? 1 ) ); $end = min( count( $lines ), max( $start, absint( $a['endLine'] ?? $start + 30 ) ), $start + 199 );
 		$slice = array_slice( $lines, $start - 1, $end - $start + 1 );
-		$html = '<figure ' . get_block_wrapper_attributes( array( 'class' => self::design_classes( $a, 'tpe-github-code', 'default' ) ) ) . '>';
-		if ( ! empty( $a['title'] ) ) $html .= '<h3>' . esc_html( $a['title'] ) . '</h3>';
+		$language = self::file_language( $d['path'] );
+		$filename = basename( $d['path'] );
+		$title = ! empty( $a['title'] ) ? $a['title'] : $filename;
+		$html = '<figure ' . get_block_wrapper_attributes( array( 'class' => self::design_classes( $a, 'tpe-github-code', 'default' ) ) ) . '><div class="tpe-code-header"><div class="tpe-code-heading">';
+		$html .= '<span class="tpe-code-eyebrow"><span class="tpe-file-icon" aria-hidden="true"></span>' . esc_html( $language ) . ' ' . esc_html__( 'file', 'turbopress-embed' ) . '</span>';
+		$html .= '<p class="tpe-code-title">' . esc_html( $title ) . '</p>';
+		if ( ! empty( $a['showFilename'] ) && ! empty( $a['title'] ) ) $html .= '<figcaption>' . esc_html( $d['path'] ) . '</figcaption>';
 		if ( ! empty( $a['description'] ) ) $html .= '<p>' . esc_html( $a['description'] ) . '</p>';
-		$html .= '<div class="tpe-code-header">';
-		if ( ! empty( $a['showFilename'] ) ) {
-			$html .= '<figcaption>' . esc_html( $d['path'] ) . '</figcaption>';
-		}
-		$html .= '<button class="tpe-code-copy" type="button" aria-live="polite">' . esc_html__( 'Copy code', 'turbopress-embed' ) . '</button></div>';
+		$html .= '</div><button class="tpe-code-copy" type="button" data-copy-label="' . esc_attr__( 'Copy code', 'turbopress-embed' ) . '" data-copied-label="' . esc_attr__( 'Copied', 'turbopress-embed' ) . '" data-error-label="' . esc_attr__( 'Copy unavailable', 'turbopress-embed' ) . '"><span class="tpe-copy-icon" aria-hidden="true"></span><span aria-live="polite">' . esc_html__( 'Copy code', 'turbopress-embed' ) . '</span></button></div>';
 		$highlights = array_filter( array_map( 'absint', preg_split( '/\s*,\s*/', $a['highlightedLines'] ?? '' ) ) );
 		$html .= '<pre style="max-height:' . esc_attr( absint( $a['maxHeight'] ?? 480 ) ) . 'px"><code>';
 		foreach ( $slice as $offset => $line ) {
@@ -782,8 +792,11 @@ class TurboPress_Remote_Data {
 			$html .= esc_html( $line ) . "\n</span>";
 		}
 		$html .= '</code></pre>';
-		if ( ! empty( $a['showGithubLink'] ) ) $html .= '<a href="' . esc_url( $d['html_url'] ) . '">' . esc_html__( 'View source on GitHub', 'turbopress-embed' ) . '</a>';
-		return $html . '</figure>';
+		$html .= '<div class="tpe-code-footer"><span>' . esc_html( $language ) . ' · ' . sprintf( esc_html( _n( '%s line', '%s lines', count( $slice ), 'turbopress-embed' ) ), number_format_i18n( count( $slice ) ) );
+		if ( ! empty( $d['branch'] ) ) $html .= ' · ' . esc_html( $d['branch'] );
+		$html .= '</span>';
+		if ( ! empty( $a['showGithubLink'] ) ) $html .= '<a href="' . esc_url( $d['html_url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'View source on GitHub', 'turbopress-embed' ) . ' <span aria-hidden="true">↗</span></a>';
+		return $html . '</div></figure>';
 	}
 
 	private static function render_github_stack( $a ) {
