@@ -1,9 +1,6 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
-const buildYoutubeThumb = ( videoId ) =>
-  videoId ? `https://i.ytimg.com/vi/${ videoId }/hqdefault.jpg` : '';
-
 const Save = ( { attributes } ) => {
   const {
     url,
@@ -35,9 +32,7 @@ const Save = ( { attributes } ) => {
       <div
         className="turbopress-embed__card"
         style={ {
-          '--tpe-thumb-image': `url(${
-            thumbnailUrl || buildYoutubeThumb( videoId )
-          })`,
+          '--tpe-thumb-image': thumbnailUrl ? `url(${ thumbnailUrl })` : 'none',
         } }
       >
         <span className="turbopress-embed__media" aria-hidden="true" />

@@ -9,13 +9,15 @@
  * Plugin Name:       TurboPress Embed
  * Plugin URI:        https://dev.claudiocirino.com
  * Description:       Embed block plugin for Gutenberg that allows you to generate previews of third-party embedded media without unnecessary loading of content that causes slow page loading
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Claudio Cirino jr
  * Author URI:        https://dev.claudiocirino.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       turbopress-embed
  * Domain Path:       /languages
+ * Requires at least: 6.0
+ * Requires PHP:      8.0
  */
 
 
@@ -24,10 +26,11 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/includes/class-turbopress-remote-data.php';
 require_once __DIR__ . '/includes/class-turbopress-nextgen-providers.php';
+require_once __DIR__ . '/includes/class-turbopress-remote-image-cache.php';
 
 final class TurboPress
 {
-    private const VERSION = '1.0.0';
+    private const VERSION = '1.1.0';
     private const CACHE_VERSION = '3';
     private const CACHE_TTL = 21600;
     private const REMOTE_TIMEOUT = 8;
@@ -63,6 +66,7 @@ final class TurboPress
         }
         TurboPress_Remote_Data::init();
         TurboPress_Nextgen_Providers::init();
+        TurboPress_Remote_Image_Cache::init();
     }
 
     public function registerAssetsAndBlocks()
@@ -166,7 +170,10 @@ final class TurboPress
         wp_register_style('turbopress-nextgen-style', plugins_url('build/nextgen_css.css', __FILE__), array(), self::VERSION);
 
         foreach (array_keys($provider_assets) as $provider_block) {
-            register_block_type(__DIR__ . '/blocks/' . $provider_block);
+            $block_options = 'youtube' === $provider_block
+                ? array('render_callback' => array($this, 'renderYouTubeBlock'))
+                : array();
+            register_block_type(__DIR__ . '/blocks/' . $provider_block, $block_options);
         }
 
         $portfolio_blocks = array(
@@ -187,6 +194,39 @@ final class TurboPress
         foreach (array('vimeo', 'github-gist', 'bluesky', 'twitch', 'smart-url', 'codepen', 'loom', 'figma') as $nextgen_block) {
             register_block_type(__DIR__ . '/blocks/' . $nextgen_block);
         }
+    }
+
+    /** Replace remote URLs in previously saved YouTube blocks at render time. */
+    public function renderYouTubeBlock($attributes, $content)
+    {
+        $video_id = isset($attributes['videoId']) ? (string) $attributes['videoId'] : '';
+        $url = isset($attributes['url']) && $attributes['url']
+            ? $attributes['url']
+            : $video_id;
+
+        if (!$url) {
+            return $content;
+        }
+
+        $metadata = TurboPress_Remote_Data::get_youtube_metadata($url);
+        if (is_wp_error($metadata)) {
+            return $content;
+        }
+
+        $local_thumbnail = isset($metadata['thumbnail']) ? esc_url_raw($metadata['thumbnail']) : '';
+        $saved_thumbnail = isset($attributes['thumbnailUrl']) ? (string) $attributes['thumbnailUrl'] : '';
+        $fallback_thumbnail = $video_id ? 'https://i.ytimg.com/vi/' . $video_id . '/hqdefault.jpg' : '';
+        if ($local_thumbnail) {
+            $content = str_replace(array_filter(array($saved_thumbnail, $fallback_thumbnail)), $local_thumbnail, $content);
+        }
+
+        $local_avatar = isset($metadata['channel']['thumbnail']) ? esc_url_raw($metadata['channel']['thumbnail']) : '';
+        $saved_avatar = isset($attributes['channelThumbnail']) ? (string) $attributes['channelThumbnail'] : '';
+        if ($local_avatar && $saved_avatar) {
+            $content = str_replace($saved_avatar, $local_avatar, $content);
+        }
+
+        return $content;
     }
 
     public function handleProviderRequest()
@@ -344,7 +384,10 @@ final class TurboPress
             'id'        => $resource['id'],
             'embedUrl'  => $this->getSpotifyEmbedUrl($resource),
             'title'     => $title,
-            'thumbnail' => isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
+            'thumbnail' => TurboPress_Remote_Image_Cache::localize(
+                isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
+                'spotify', $resource['type'] . ':' . $resource['id'], 'artwork'
+            ),
         );
     }
 
@@ -421,6 +464,11 @@ final class TurboPress
         $thumbnail = isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '';
         if (!$this->isTrustedTikTokImageUrl($thumbnail)) {
             $thumbnail = '';
+        }
+
+        if ($video_id) {
+            $thumbnail = TurboPress_Remote_Image_Cache::localize($thumbnail, 'tiktok', 'video:' . $video_id, 'cover');
+            $avatar = TurboPress_Remote_Image_Cache::localize($avatar, 'tiktok', 'user:' . ($username ?: $video_id), 'avatar');
         }
 
         $canonical_url = $url;
@@ -595,7 +643,10 @@ final class TurboPress
             'provider'   => 'soundcloud',
             'url'        => $url,
             'title'      => isset($data['title']) ? sanitize_text_field($data['title']) : '',
-            'thumbnail'  => isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
+            'thumbnail'  => TurboPress_Remote_Image_Cache::localize(
+                isset($data['thumbnail_url']) ? esc_url_raw($data['thumbnail_url']) : '',
+                'soundcloud', 'url:' . hash('sha256', $url), 'artwork'
+            ),
             'authorName' => isset($data['author_name']) ? sanitize_text_field($data['author_name']) : '',
             'playerUrl'  => esc_url_raw($matches[1]),
         );

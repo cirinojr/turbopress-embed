@@ -45,6 +45,7 @@ final class TurboPress_Nextgen_Providers {
 		}
 		$payload = self::fetch( $provider, $resource );
 		if ( is_wp_error( $payload ) ) return is_array( $entry ) ? $entry['payload'] : $payload;
+		$payload = self::localize_images( $provider, $resource, $payload, is_array( $entry ) ? ( $entry['payload'] ?? array() ) : array() );
 		self::store( $key, $provider, $payload );
 		return $payload;
 	}
@@ -64,6 +65,21 @@ final class TurboPress_Nextgen_Providers {
 
 	public static function revalidate( $provider, $url ) {
 		self::get( $provider, $url, true );
+	}
+
+	private static function localize_images( $provider, $resource, $payload, $previous ) {
+		$identity = $resource['type'] . ':' . $resource['id'];
+		if ( ! empty( $payload['thumbnail'] ) ) {
+			$source = $payload['thumbnail'];
+			$payload['thumbnail'] = TurboPress_Remote_Image_Cache::localize( $source, $provider, $identity, 'thumbnail', $previous['thumbnail'] ?? '' );
+			$payload['thumbnailSource'] = $source;
+		}
+		if ( 'bluesky' === $provider && ! empty( $payload['avatar'] ) ) {
+			$source = $payload['avatar'];
+			$payload['avatar'] = TurboPress_Remote_Image_Cache::localize( $source, $provider, 'actor:' . $resource['actor'], 'avatar', $previous['avatar'] ?? '' );
+			$payload['avatarSource'] = $source;
+		}
+		return $payload;
 	}
 
 	private static function parse( $provider, $url ) {

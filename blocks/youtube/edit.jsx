@@ -38,9 +38,6 @@ const getYoutubeVideoId = ( url ) => {
   }
 };
 
-const buildYoutubeThumb = ( videoId ) =>
-  videoId ? `https://i.ytimg.com/vi/${ videoId }/hqdefault.jpg` : '';
-
 const Edit = ( { attributes, setAttributes } ) => {
   const {
     url,
@@ -81,8 +78,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 
     const fetchedTitle =
       response.data?.title || __( 'Untitled video', 'turbopress-embed' );
-    const fetchedThumb =
-      response.data?.thumbnail || buildYoutubeThumb( parsedVideoId );
+    const fetchedThumb = response.data?.thumbnail || '';
 
     setAttributes( {
       url: response.data?.canonicalUrl || embedUrl,
@@ -211,9 +207,9 @@ const Edit = ( { attributes, setAttributes } ) => {
         <div
           className="turbopress-embed__card"
           style={ {
-            '--tpe-thumb-image': `url(${
-              thumbnailUrl || buildYoutubeThumb( videoId )
-            })`,
+            '--tpe-thumb-image': thumbnailUrl
+              ? `url(${ thumbnailUrl })`
+              : 'none',
           } }
         >
           <span className="turbopress-embed__media" aria-hidden="true" />

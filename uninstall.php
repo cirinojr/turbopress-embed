@@ -29,3 +29,6 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+// Generated cache files follow the plugin's existing preserve-on-uninstall policy.
+wp_clear_scheduled_hook( 'turbopress_embed_cleanup_remote_images' );

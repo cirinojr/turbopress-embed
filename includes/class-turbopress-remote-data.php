@@ -30,6 +30,9 @@ class TurboPress_Remote_Data {
 		if ( false === $entry ) {
 			$entry = get_transient( $key );
 		}
+		if ( is_array( $entry ) && ! empty( $entry['payload'] ) ) {
+			$entry['payload'] = self::refresh_cached_youtube_images( $entry['payload'], $video_id );
+		}
 		$now = time();
 		if ( ! $force && is_array( $entry ) && $entry['revalidate_at'] > $now ) {
 			self::$memo[ $key ] = array( 'payload' => $entry['payload'] );
@@ -50,6 +53,23 @@ class TurboPress_Remote_Data {
 		self::store( $key, $updated );
 		self::$memo[ $key ] = array( 'payload' => $updated['payload'] );
 		return $updated['payload'];
+	}
+
+	/** Reuse or format-upgrade cached files without fetching YouTube metadata again. */
+	private static function refresh_cached_youtube_images( $payload, $video_id ) {
+		if ( ! empty( $payload['thumbnailSource'] ) ) {
+			$payload['thumbnail'] = TurboPress_Remote_Image_Cache::localize(
+				$payload['thumbnailSource'], 'youtube', 'video:' . $video_id, 'thumbnail', $payload['thumbnail'] ?? ''
+			);
+			$payload['video']['thumbnail'] = $payload['thumbnail'];
+		}
+		if ( ! empty( $payload['channel']['thumbnailSource'] ) ) {
+			$identity = $payload['channel']['id'] ?: ( $payload['channel']['url'] ?? $video_id );
+			$payload['channel']['thumbnail'] = TurboPress_Remote_Image_Cache::localize(
+				$payload['channel']['thumbnailSource'], 'youtube', 'channel:' . $identity, 'avatar', $payload['channel']['thumbnail'] ?? ''
+			);
+		}
+		return $payload;
 	}
 
 	private static function parse_youtube_video_id( $url ) {
@@ -133,8 +153,25 @@ class TurboPress_Remote_Data {
 		if ( is_wp_error( $payload ) ) {
 			return $payload;
 		}
+		$previous_payload = is_array( $previous ) ? ( $previous['payload'] ?? array() ) : array();
+		$thumbnail_source = $payload['thumbnail'] ?? '';
+		$payload['thumbnail'] = TurboPress_Remote_Image_Cache::localize(
+			$thumbnail_source, 'youtube', 'video:' . $video_id, 'thumbnail', $previous_payload['thumbnail'] ?? ''
+		);
+		$payload['video']['thumbnail'] = $payload['thumbnail'];
+		$payload['thumbnailSource'] = $thumbnail_source;
+		if ( ! empty( $payload['channel']['thumbnail'] ) ) {
+			$avatar_source = $payload['channel']['thumbnail'];
+			$channel_identity = $payload['channel']['id'] ?: ( $payload['channel']['url'] ?? $video_id );
+			$payload['channel']['thumbnail'] = TurboPress_Remote_Image_Cache::localize(
+				$avatar_source, 'youtube', 'channel:' . $channel_identity, 'avatar', $previous_payload['channel']['thumbnail'] ?? ''
+			);
+			$payload['channel']['thumbnailSource'] = $avatar_source;
+		}
 		$fingerprint_payload = $payload;
 		unset( $fingerprint_payload['fetchedAt'] );
+		unset( $fingerprint_payload['thumbnailSource'] );
+		if ( isset( $fingerprint_payload['channel'] ) ) unset( $fingerprint_payload['channel']['thumbnailSource'] );
 		$fingerprint = hash( 'sha256', wp_json_encode( $fingerprint_payload ) );
 		return array(
 			'payload' => $payload,

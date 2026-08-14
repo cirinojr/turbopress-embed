@@ -46,7 +46,13 @@ const getTikTokImageUrl = ( value ) => {
       ( suffix ) =>
         url.hostname === suffix || url.hostname.endsWith( `.${ suffix }` ),
     );
-    return url.protocol === 'https:' && trustedHost ? url.href : '';
+    const localUpload =
+      url.origin === window.location.origin &&
+      url.pathname.includes( '/turbopress-embed/remote-images/' );
+    return ( url.protocol === 'https:' && trustedHost ) ||
+      ( localUpload && [ 'http:', 'https:' ].includes( url.protocol ) )
+      ? url.href
+      : '';
   } catch {
     return '';
   }
